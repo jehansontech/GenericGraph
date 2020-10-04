@@ -110,7 +110,7 @@ public struct Graph<N, E> {
         
     public init() {}
     
-    public mutating func addNode(value: N? = nil) -> Node {
+    @discardableResult public mutating func addNode(value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
         
@@ -119,19 +119,20 @@ public struct Graph<N, E> {
         return newNode
     }
     
+    /// remove the given node and all its edges. node and edge values are discarded
     public mutating func removeNode(_ id: NodeID) {
-        if let Node = _nodes.removeValue(forKey: id) {
-            for edge in Node.inEdges {
+        if let node = _nodes.removeValue(forKey: id) {
+            for edge in node.inEdges {
                 removeEdge(edge.id)
             }
-            for edge in Node.outEdges {
+            for edge in node.outEdges {
                 removeEdge(edge.id)
             }
         }
     }
     
     /// source and destination MUST be nodes in this graph
-    public mutating func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
+    @discardableResult public mutating func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
         let id = _nextEdgeID
         _nextEdgeID += 1
         
@@ -142,6 +143,7 @@ public struct Graph<N, E> {
         return newEdge
     }
     
+    /// removes the given edge. edge value is discarded
     public mutating func removeEdge(_ id: EdgeID) {
         if let edge = _edges.removeValue(forKey: id) {
             edge.source._outEdges.removeValue(forKey: id)
