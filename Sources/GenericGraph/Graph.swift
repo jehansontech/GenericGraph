@@ -18,24 +18,23 @@ public struct Graph<N, E> {
         /// Graph-assigned identifier. Unique within any one graph.
         public let id: NodeID
         
-        /// User-assignable identifier
-        public var name: String?
-        
         public var description: String {
-            if let name = name {
-                return name
-            }
-            else {
-                return "Node \(id)"
-            }
+            return "Node \(id)"
         }
         
+        /// number of in-edges
         public var inDegree: Int {
             return _inEdges.count
         }
         
+        /// number of out-edges
         public var outDegree: Int {
             return _outEdges.count
+        }
+        
+        /// total number of edges
+        public var degree: Int {
+            return _inEdges.count + _outEdges.count
         }
         
         public var inEdges: Dictionary<EdgeID, Edge>.Values {
@@ -52,10 +51,21 @@ public struct Graph<N, E> {
         
         public var value: N?
 
-        public init(_ id: NodeID, _ name: String?, _ value: N?) {
+        public init(_ id: NodeID, _ value: N?) {
             self.id = id
-            self.name = name
             self.value = value
+        }
+        
+        /// returns array containing sources of all in-edges and destinations of all out-edges
+        public func neighbors() -> [Node] {
+            var nbrs = [Node]()
+            for (_, edge) in _inEdges {
+                nbrs.append(edge.source)
+            }
+            for (_, edge) in _outEdges {
+                nbrs.append(edge.destination)
+            }
+            return nbrs;
         }
     }
         
@@ -68,25 +78,16 @@ public struct Graph<N, E> {
         
         public weak var destination: Node!
         
-        /// User-assignable identifier
-        public var name: String?
-        
         public var description: String {
-            if let name = name {
-                return name
-            }
-            else {
-                return "Edge \(id)"
-            }
+            return "Edge \(id)"
         }
         
         public var value: E? = nil
         
-        public init(_ id: EdgeID, _ source: Node, _ destination: Node, _ name: String?, _ value: E?) {
+        public init(_ id: EdgeID, _ source: Node, _ destination: Node, _ value: E?) {
             self.id = id
             self.source = source
             self.destination = destination
-            self.name = name
             self.value = value
         }
     }
@@ -109,11 +110,11 @@ public struct Graph<N, E> {
         
     public init() {}
     
-    public mutating func addNode(name: String? = nil, value: N? = nil) -> Node {
+    public mutating func addNode(value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
         
-        let newNode = Node(id, name, value)
+        let newNode = Node(id, value)
         _nodes[id] = newNode
         return newNode
     }
@@ -130,11 +131,11 @@ public struct Graph<N, E> {
     }
     
     /// source and destination MUST be nodes in this graph
-    public mutating func addEdge(_ source: Node, _ destination: Node, name: String? = nil, value: E? = nil) -> Edge {
+    public mutating func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
         let id = _nextEdgeID
         _nextEdgeID += 1
         
-        let newEdge = Edge(id, source, destination, name, value)
+        let newEdge = Edge(id, source, destination, value)
         _edges[id] = newEdge
         source._outEdges[id] = newEdge
         destination._inEdges[id] = newEdge
