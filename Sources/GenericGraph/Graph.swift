@@ -107,6 +107,8 @@ public struct Graph<N, E> {
     
     private var _nextEdgeID = 0
         
+    public init() {}
+    
     public mutating func addNode(name: String? = nil, value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
