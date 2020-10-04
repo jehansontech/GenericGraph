@@ -7,21 +7,21 @@
 
 import Foundation
 
-typealias NodeID = Int
+public typealias NodeID = Int
 
-typealias EdgeID = Int
+public typealias EdgeID = Int
 
 public struct Graph<N, E> {
     
-    class Node: CustomStringConvertible {
+    public class Node: CustomStringConvertible {
 
         /// Graph-assigned identifier. Unique within any one graph.
-        let id: NodeID
+        public let id: NodeID
         
         /// User-assignable identifier
         var name: String?
         
-        var description: String {
+        public var description: String {
             if let name = name {
                 return name
             }
@@ -30,19 +30,19 @@ public struct Graph<N, E> {
             }
         }
         
-        var inDegree: Int {
+        public var inDegree: Int {
             return _inEdges.count
         }
         
-        var outDegree: Int {
+        public var outDegree: Int {
             return _outEdges.count
         }
         
-        var inEdges: Dictionary<EdgeID, Edge>.Values {
+        public var inEdges: Dictionary<EdgeID, Edge>.Values {
             return _inEdges.values
         }
         
-        var outEdges: Dictionary<EdgeID, Edge>.Values {
+        public var outEdges: Dictionary<EdgeID, Edge>.Values {
             return _outEdges.values
         }
         
@@ -50,28 +50,28 @@ public struct Graph<N, E> {
         
         internal var _outEdges = [EdgeID: Edge]()
         
-        var value: N?
+        public var value: N?
 
-        init(_ id: NodeID, _ name: String?, _ value: N?) {
+        public init(_ id: NodeID, _ name: String?, _ value: N?) {
             self.id = id
             self.name = name
             self.value = value
         }
     }
         
-    class Edge: CustomStringConvertible {
+    public class Edge: CustomStringConvertible {
         
         /// Graph-assigned identifier. Unique within any one graph.
-        let id: EdgeID
+        public let id: EdgeID
         
-        weak var source: Node!
+        public weak var source: Node!
         
-        weak var destination: Node!
+        public weak var destination: Node!
         
         /// User-assignable identifier
-        var name: String?
+        public var name: String?
         
-        var description: String {
+        public var description: String {
             if let name = name {
                 return name
             }
@@ -80,9 +80,9 @@ public struct Graph<N, E> {
             }
         }
         
-        var value: E? = nil
+        public var value: E? = nil
         
-        init(_ id: EdgeID, _ source: Node, _ destination: Node, _ name: String?, _ value: E?) {
+        public init(_ id: EdgeID, _ source: Node, _ destination: Node, _ name: String?, _ value: E?) {
             self.id = id
             self.source = source
             self.destination = destination
@@ -91,11 +91,11 @@ public struct Graph<N, E> {
         }
     }
         
-    var nodes: Dictionary<NodeID, Node>.Values {
+    public var nodes: Dictionary<NodeID, Node>.Values {
         return _nodes.values
     }
     
-    var edges: Dictionary<EdgeID, Edge>.Values {
+    public var edges: Dictionary<EdgeID, Edge>.Values {
         return _edges.values
     }
     
@@ -107,7 +107,7 @@ public struct Graph<N, E> {
     
     private var _nextEdgeID = 0
         
-    mutating func addNode(name: String? = nil, value: N? = nil) -> Node {
+    public mutating func addNode(name: String? = nil, value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
         
@@ -116,7 +116,7 @@ public struct Graph<N, E> {
         return newNode
     }
     
-    mutating func removeNode(_ id: NodeID) {
+    public mutating func removeNode(_ id: NodeID) {
         if let Node = _nodes.removeValue(forKey: id) {
             for edge in Node.inEdges {
                 removeEdge(edge.id)
@@ -128,7 +128,7 @@ public struct Graph<N, E> {
     }
     
     /// source and destination MUST be nodes in this graph
-    mutating func addEdge(_ source: Node, _ destination: Node, name: String? = nil, value: E? = nil) -> Edge {
+    public mutating func addEdge(_ source: Node, _ destination: Node, name: String? = nil, value: E? = nil) -> Edge {
         let id = _nextEdgeID
         _nextEdgeID += 1
         
@@ -139,7 +139,7 @@ public struct Graph<N, E> {
         return newEdge
     }
     
-    mutating func removeEdge(_ id: EdgeID) {
+    public mutating func removeEdge(_ id: EdgeID) {
         if let edge = _edges.removeValue(forKey: id) {
             edge.source._outEdges.removeValue(forKey: id)
             edge.destination._inEdges.removeValue(forKey: id)
