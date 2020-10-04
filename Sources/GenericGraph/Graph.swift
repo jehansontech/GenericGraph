@@ -11,7 +11,7 @@ typealias NodeID = Int
 
 typealias EdgeID = Int
 
-struct Graph<N, E> {
+public struct Graph<N, E> {
     
     class Node: CustomStringConvertible {
 
