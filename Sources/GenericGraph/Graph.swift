@@ -19,7 +19,7 @@ public struct Graph<N, E> {
         public let id: NodeID
         
         /// User-assignable identifier
-        var name: String?
+        public var name: String?
         
         public var description: String {
             if let name = name {
