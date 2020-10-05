@@ -11,7 +11,11 @@ public typealias NodeID = Int
 
 public typealias EdgeID = Int
 
-public struct Graph<N, E> {
+enum GraphError: Error {
+    case noSuchNode(id: NodeID)
+}
+
+public class Graph<N, E> {
     
     public class Node: CustomStringConvertible {
 
@@ -110,7 +114,7 @@ public struct Graph<N, E> {
         
     public init() {}
     
-    @discardableResult public mutating func addNode(value: N? = nil) -> Node {
+    @discardableResult public func addNode(value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
         
@@ -120,7 +124,7 @@ public struct Graph<N, E> {
     }
     
     /// remove the given node and all its edges. node and edge values are discarded
-    public mutating func removeNode(_ id: NodeID) {
+    public func removeNode(_ id: NodeID) {
         if let node = _nodes.removeValue(forKey: id) {
             for edge in node.inEdges {
                 removeEdge(edge.id)
@@ -132,7 +136,7 @@ public struct Graph<N, E> {
     }
     
     /// source and destination MUST be nodes in this graph
-    @discardableResult public mutating func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
+    @discardableResult public func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
         let id = _nextEdgeID
         _nextEdgeID += 1
         
@@ -143,8 +147,24 @@ public struct Graph<N, E> {
         return newEdge
     }
     
+    @discardableResult public func addEdge(sourceID: NodeID, destinationID: NodeID, value: E? = nil) throws -> Edge {
+        guard
+            let source = _nodes[sourceID]
+        else {
+            throw GraphError.noSuchNode(id: sourceID)
+        }
+        
+        guard
+            let destination = _nodes[destinationID]
+        else {
+            throw GraphError.noSuchNode(id: destinationID)
+        }
+
+        return addEdge(source, destination, value: value)
+    }
+    
     /// removes the given edge. edge value is discarded
-    public mutating func removeEdge(_ id: EdgeID) {
+    public func removeEdge(_ id: EdgeID) {
         if let edge = _edges.removeValue(forKey: id) {
             edge.source._outEdges.removeValue(forKey: id)
             edge.destination._inEdges.removeValue(forKey: id)
