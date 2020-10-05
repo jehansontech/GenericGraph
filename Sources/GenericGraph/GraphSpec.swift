@@ -13,7 +13,7 @@ enum GraphSpecError: Error {
 }
 
 
-public struct GraphSpec<N, E>: Codable {
+public struct GraphSpec<N: Codable, E: Codable>: Codable {
     
     struct NodeSpec: Codable {
                 
@@ -23,10 +23,7 @@ public struct GraphSpec<N, E>: Codable {
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            // TODO decode value
-            self.value = nil
-            
+            self.value = try container.decode(N.self, forKey: .value)
             self.outEdges = try container.decode([EdgeID].self, forKey: .outEdges)
         }
         
@@ -39,9 +36,7 @@ public struct GraphSpec<N, E>: Codable {
         }
         
         enum CodingKeys: String, CodingKey {
-
-            // TODO case value
-
+            case value
             case outEdges
         }
     }
@@ -54,10 +49,7 @@ public struct GraphSpec<N, E>: Codable {
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
-            // TODO decode value
-            self.value = nil
-
+            self.value = try container.decode(E.self, forKey: .value)
             self.destination = try container.decode(NodeID.self, forKey: .destination)
         }
         
@@ -67,8 +59,7 @@ public struct GraphSpec<N, E>: Codable {
         }
         
         enum CodingKeys: String, CodingKey {
-            
-            // TODO case value
+            case value
             case destination
         }
     }

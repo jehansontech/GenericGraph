@@ -60,6 +60,16 @@ public class Graph<N, E> {
             self.value = value
         }
         
+        // MAYBE
+        //        public func inEdge(withID id: EdgeID) -> Edge? {
+        //            return _inEdges[id]
+        //        }
+        
+        // MAYBE
+        //        public func outEdge(withID id: EdgeID) -> Edge? {
+        //            return _outEdges[id]
+        //        }
+        
         /// returns array containing sources of all in-edges and destinations of all out-edges
         public func neighbors() -> [Node] {
             var nbrs = [Node]()
@@ -114,6 +124,11 @@ public class Graph<N, E> {
         
     public init() {}
     
+    // MAYBE
+    //    public func node(withID id: NodeID) -> Node? {
+    //        return _nodes[id]
+    //    }
+    
     @discardableResult public func addNode(value: N? = nil) -> Node {
         let id = _nextNodeID
         _nextNodeID += 1
@@ -134,6 +149,11 @@ public class Graph<N, E> {
             }
         }
     }
+    
+    // MAYBE
+    //    public func edge(withID id: EdgeID) -> Edge? {
+    //        return _edges[id]
+    //    }
     
     /// source and destination MUST be nodes in this graph
     @discardableResult public func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
