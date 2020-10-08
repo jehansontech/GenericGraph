@@ -1,7 +1,7 @@
 import XCTest
 @testable import GenericGraph
 
-final class GraphTests: XCTestCase {
+final class BaseGraphTests: XCTestCase {
 
     func testGraphCreation() {
         let g = Graph<Any, Any>()

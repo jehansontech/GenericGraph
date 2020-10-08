@@ -69,7 +69,7 @@ final class GraphSpecTests: XCTestCase {
      
         let decoder = JSONDecoder()
         let spec = try decoder.decode(GraphSpec<String, String>.self, from: json)
-        let graph = try spec.buildGraph()
+        _ = try spec.buildGraph()
     }
     
     func testRoundTrip() throws {

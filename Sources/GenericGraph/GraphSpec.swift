@@ -78,7 +78,16 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
             self.edges[edge.id] = EdgeSpec(edge)
         }
     }
-    
+
+    public init(_ graph: Graph<N, E>, _ nodeIDs: Set<NodeID>) {
+        for node in graph.nodes.filter({ nodeIDs.contains($0.id) }) {
+            self.nodes[node.id] = NodeSpec(node)
+        }
+        for edge in graph.edges.filter({ nodeIDs.contains($0.source.id) && nodeIDs.contains($0.destination.id)}) {
+            self.edges[edge.id] = EdgeSpec(edge)
+        }
+    }
+
     public func buildGraph() throws -> Graph<N, E> {
         let graph = Graph<N, E>()
         
