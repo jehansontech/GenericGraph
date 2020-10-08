@@ -1,30 +1,19 @@
 //
 //  Graph.swift
-//  GenericGraph
+//  
 //
-//  Created by James Hanson on 10/4/20.
+//  Created by Jim Hanson on 10/8/20.
 //
 
 import Foundation
 
-public typealias NodeID = Int
-
-public typealias EdgeID = Int
-
-enum GraphError: Error {
-    case noSuchNode(id: NodeID)
-}
-
-public class Graph<N, E> {
+public class Graph<N, E>: GraphProtocol {
     
-    public class Node: CustomStringConvertible {
-
+    public class Node: GraphNode {
+        typealias NodeValueType = N
+        
         /// Graph-assigned identifier. Unique within any one graph.
         public let id: NodeID
-        
-        public var description: String {
-            return "Node \(id)"
-        }
         
         /// number of in-edges
         public var inDegree: Int {
@@ -34,11 +23,6 @@ public class Graph<N, E> {
         /// number of out-edges
         public var outDegree: Int {
             return _outEdges.count
-        }
-        
-        /// total number of edges
-        public var degree: Int {
-            return _inEdges.count + _outEdges.count
         }
         
         public var inEdges: Dictionary<EdgeID, Edge>.Values {
@@ -54,21 +38,19 @@ public class Graph<N, E> {
         internal var _outEdges = [EdgeID: Edge]()
         
         public var value: N?
-
+        
         public init(_ id: NodeID, _ value: N?) {
             self.id = id
             self.value = value
         }
         
-        // MAYBE
-        //        public func inEdge(withID id: EdgeID) -> Edge? {
-        //            return _inEdges[id]
-        //        }
+        public func inEdge(withID id: EdgeID) -> Edge? {
+            return _inEdges[id]
+        }
         
-        // MAYBE
-        //        public func outEdge(withID id: EdgeID) -> Edge? {
-        //            return _outEdges[id]
-        //        }
+        public func outEdge(withID id: EdgeID) -> Edge? {
+            return _outEdges[id]
+        }
         
         /// returns array containing sources of all in-edges and destinations of all out-edges
         public func neighbors() -> [Node] {
@@ -82,8 +64,9 @@ public class Graph<N, E> {
             return nbrs;
         }
     }
-        
-    public class Edge: CustomStringConvertible {
+    
+    public class Edge: GraphEdge {
+        typealias EdgeValueType = E
         
         /// Graph-assigned identifier. Unique within any one graph.
         public let id: EdgeID
@@ -91,10 +74,6 @@ public class Graph<N, E> {
         public weak var source: Node!
         
         public weak var destination: Node!
-        
-        public var description: String {
-            return "Edge \(id)"
-        }
         
         public var value: E? = nil
         
@@ -105,7 +84,7 @@ public class Graph<N, E> {
             self.value = value
         }
     }
-        
+    
     public var nodes: Dictionary<NodeID, Node>.Values {
         return _nodes.values
     }
@@ -121,13 +100,12 @@ public class Graph<N, E> {
     private var _edges = [EdgeID: Edge]()
     
     private var _nextEdgeID = 0
-        
+    
     public init() {}
     
-    // MAYBE
-    //    public func node(withID id: NodeID) -> Node? {
-    //        return _nodes[id]
-    //    }
+    public func node(withID id: NodeID) -> Node? {
+        return _nodes[id]
+    }
     
     @discardableResult public func addNode(value: N? = nil) -> Node {
         let id = _nextNodeID
@@ -150,10 +128,9 @@ public class Graph<N, E> {
         }
     }
     
-    // MAYBE
-    //    public func edge(withID id: EdgeID) -> Edge? {
-    //        return _edges[id]
-    //    }
+    public func edge(withID id: EdgeID) -> Edge? {
+        return _edges[id]
+    }
     
     /// source and destination MUST be nodes in this graph
     @discardableResult public func addEdge(_ source: Node, _ destination: Node, value: E? = nil) -> Edge {
@@ -179,7 +156,7 @@ public class Graph<N, E> {
         else {
             throw GraphError.noSuchNode(id: destinationID)
         }
-
+        
         return addEdge(source, destination, value: value)
     }
     
