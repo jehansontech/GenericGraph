@@ -7,13 +7,24 @@
 
 import Foundation
 
-public class Graph<N, E>: GraphProtocol {
+public typealias NodeID = Int
+
+public typealias EdgeID = Int
+
+public enum GraphError: Error {
+    case noSuchNode(id: NodeID)
+}
+
+public class Graph<N, E> {
     
-    public class Node: GraphNode {
-        typealias NodeValueType = N
+    public class Node: CustomStringConvertible {
         
         /// Graph-assigned identifier. Unique within any one graph.
         public let id: NodeID
+        
+        public var description: String {
+            return "Node \(id)"
+        }
         
         /// number of in-edges
         public var inDegree: Int {
@@ -25,6 +36,10 @@ public class Graph<N, E>: GraphProtocol {
             return _outEdges.count
         }
         
+        public var degree: Int {
+            return inDegree + outDegree
+        }
+
         public var inEdges: Dictionary<EdgeID, Edge>.Values {
             return _inEdges.values
         }
@@ -65,11 +80,14 @@ public class Graph<N, E>: GraphProtocol {
         }
     }
     
-    public class Edge: GraphEdge {
-        typealias EdgeValueType = E
+    public class Edge: CustomStringConvertible  {
         
         /// Graph-assigned identifier. Unique within any one graph.
         public let id: EdgeID
+        
+        public var description: String {
+            return "Edge \(id)"
+        }
         
         public weak var source: Node!
         
