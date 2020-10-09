@@ -51,9 +51,11 @@ public class Edge<N, E>: GraphElement {
 public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Edge<N, E>
     
+    var edges: Dictionary<EdgeID, Edge<N, E>>
     var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
     
     init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
+        self.edges = edges
         self.iterator = edges.makeIterator()
     }
     
@@ -104,25 +106,24 @@ public class Node<N, E>: GraphElement {
     public func inEdge(withID id: EdgeID) -> Edge<N, E>? {
         return _inEdges[id]
     }
-    
-    public func outEdge(withID id: EdgeID) -> Edge<N, E>? {
-        return _outEdges[id]
-    }
 }
 
 
 public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Node<N,E>
     
+    var nodes: Dictionary<NodeID, Node<N, E>>
     var iterator: Dictionary<NodeID, Node<N, E>>.Iterator
     
     init(_ nodes: [NodeID : Node<N, E>]) {
+        self.nodes = nodes
         self.iterator = nodes.makeIterator()
     }
     
     public mutating func next() -> Node<N, E>? {
         return iterator.next()?.value
     }
+    
 }
 
 
@@ -136,7 +137,7 @@ public class Graph<N, E> {
         return NodeSequence<N, E>(_nodes)
     }
     
-    private var _nodes = [NodeID: Node<N, E>]()
+    internal var _nodes = [NodeID: Node<N, E>]()
     
     private var _nextNodeID = 0
     
@@ -148,7 +149,7 @@ public class Graph<N, E> {
         return EdgeSequence<N, E>(_edges)
     }
     
-    private var _edges = [EdgeID: Edge<N, E>]()
+    internal var _edges = [EdgeID: Edge<N, E>]()
     
     private var _nextEdgeID = 0
     

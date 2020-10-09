@@ -50,4 +50,14 @@ extension Node: CustomStringConvertible {
         }
         return nbrs
     }
+    
+}
+
+extension Graph {
+    
+    public func randomNode() -> Node<N, E>? {
+        return _nodes.randomElement()?.value
+    }
+    
+
 }
