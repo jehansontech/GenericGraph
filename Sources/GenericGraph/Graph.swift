@@ -17,18 +17,19 @@ public enum GraphError: Error {
 }
 
 
-protocol GraphElement {
+public protocol GraphElement {
     associatedtype Identifier
     associatedtype ValueType
     
     var id: Identifier { get }
+    
     var value: ValueType? { get set }
 }
 
 
 public class Edge<N, E>: GraphElement {
-    typealias Identifier = EdgeID
-    typealias ValueType = E
+    public typealias Identifier = EdgeID
+    public typealias ValueType = E
 
     /// Unique within any one graph
     public let id: EdgeID
@@ -52,6 +53,7 @@ public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Edge<N, E>
     
     var edges: Dictionary<EdgeID, Edge<N, E>>
+    
     var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
     
     init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
@@ -66,8 +68,8 @@ public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
 
 
 public class Node<N, E>: GraphElement {
-    typealias Identifier = NodeID
-    typealias ValueType = N
+    public typealias Identifier = NodeID
+    public typealias ValueType = N
     
     /// Unique within any one graph
     public let id: NodeID
@@ -102,10 +104,6 @@ public class Node<N, E>: GraphElement {
         self.id = id
         self.value = value
     }
-    
-    public func inEdge(withID id: EdgeID) -> Edge<N, E>? {
-        return _inEdges[id]
-    }
 }
 
 
@@ -113,6 +111,7 @@ public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Node<N,E>
     
     var nodes: Dictionary<NodeID, Node<N, E>>
+    
     var iterator: Dictionary<NodeID, Node<N, E>>.Iterator
     
     init(_ nodes: [NodeID : Node<N, E>]) {
@@ -123,7 +122,6 @@ public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public mutating func next() -> Node<N, E>? {
         return iterator.next()?.value
     }
-    
 }
 
 
