@@ -89,8 +89,8 @@ final class GraphSpecTests: XCTestCase {
         let spec = try decoder.decode(GraphSpec<String, String>.self, from: decodedData)
         let graph2 = try spec.buildGraph()
 
-        XCTAssertEqual(graph2.nodes.count, 2)
-        XCTAssertEqual(graph2.edges.count, 2)
+        XCTAssertEqual(graph2.nodeCount, 2)
+        XCTAssertEqual(graph2.edgeCount, 2)
         // TODO check equality with graph1
     }
     

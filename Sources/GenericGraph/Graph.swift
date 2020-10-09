@@ -16,7 +16,7 @@ public enum GraphError: Error {
 }
 
 
-public class NodeSequence<N, E>: Sequence, IteratorProtocol {
+public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Graph<N,E>.Node
     
     var iterator: Dictionary<NodeID, Graph<N, E>.Node>.Iterator
@@ -25,12 +25,12 @@ public class NodeSequence<N, E>: Sequence, IteratorProtocol {
         self.iterator = nodes.makeIterator()
     }
     
-    public func next() -> Graph<N, E>.Node? {
+    public mutating func next() -> Graph<N, E>.Node? {
         return iterator.next()?.value
     }
 }
 
-public class EdgeSequence<N, E>: Sequence, IteratorProtocol {
+public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Graph<N, E>.Edge
     
     var iterator: Dictionary<EdgeID, Graph<N, E>.Edge>.Iterator
@@ -39,7 +39,7 @@ public class EdgeSequence<N, E>: Sequence, IteratorProtocol {
         self.iterator = edges.makeIterator()
     }
     
-    public func next() -> Graph<N, E>.Edge? {
+    public mutating func next() -> Graph<N, E>.Edge? {
         return iterator.next()?.value
     }
 }
@@ -70,12 +70,12 @@ public class Graph<N, E> {
             return inDegree + outDegree
         }
 
-        public var inEdges: Dictionary<EdgeID, Edge>.Values {
-            return _inEdges.values
+        public var inEdges: EdgeSequence<N, E> {
+            return EdgeSequence<N, E>(_inEdges)
         }
         
-        public var outEdges: Dictionary<EdgeID, Edge>.Values {
-            return _outEdges.values
+        public var outEdges: EdgeSequence<N, E> {
+            return EdgeSequence(_outEdges)
         }
         
         internal var _inEdges = [EdgeID: Edge]()
@@ -133,17 +133,25 @@ public class Graph<N, E> {
         }
     }
     
-    public var nodes: Dictionary<NodeID, Node>.Values {
-        return _nodes.values
+    public var nodeCount: Int {
+        return _nodes.count
     }
     
-    public var edges: Dictionary<EdgeID, Edge>.Values {
-        return _edges.values
+    public var nodes: NodeSequence<N, E> {
+        return NodeSequence<N, E>(_nodes)
     }
     
     private var _nodes = [NodeID: Node]()
     
     private var _nextNodeID = 0
+    
+    public var edgeCount: Int {
+        return _edges.count
+    }
+    
+    public var edges: EdgeSequence<N, E> {
+        return EdgeSequence<N, E>(_edges)
+    }
     
     private var _edges = [EdgeID: Edge]()
     
