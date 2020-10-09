@@ -15,7 +15,7 @@ final class GraphSpecTests: XCTestCase {
         let graphNode = graph.addNode(value: "graphNode")
         let graphEdge = try graph.addEdge(graphNode.id, graphNode.id, value: 99)
 
-        let spec = GraphSpec<String, Int>(graph)
+        let spec = GraphCoder<String, Int>(graph)
         XCTAssertEqual(spec.nodes.count, 1)
         XCTAssertEqual(spec.nodes.first!.value.value, graphNode.value)
         XCTAssertEqual(spec.nodes.first!.value.outEdges.count, 1)
@@ -32,7 +32,7 @@ final class GraphSpecTests: XCTestCase {
         try graph.addEdge(n1.id, n2.id, value: "e1")
         try graph.addEdge(n2.id, n1.id, value: "e2")
 
-        let spec = GraphSpec<String, String>(graph)
+        let spec = GraphCoder<String, String>(graph)
         let encoder = JSONEncoder()
         let data = try encoder.encode(spec)
         let jsonString = String(data: data, encoding: .utf8)!
@@ -68,8 +68,8 @@ final class GraphSpecTests: XCTestCase {
 """.data(using: .utf8)!
      
         let decoder = JSONDecoder()
-        let spec = try decoder.decode(GraphSpec<String, String>.self, from: json)
-        _ = try spec.buildGraph()
+        let spec = try decoder.decode(GraphCoder<String, String>.self, from: json)
+        _ = try spec.makeGraph()
     }
     
     func testRoundTrip() throws {
@@ -80,14 +80,14 @@ final class GraphSpecTests: XCTestCase {
         try graph1.addEdge(n2.id, n1.id, value: "e2")
         
         let encoder = JSONEncoder()
-        let specToEncode = GraphSpec<String, String>(graph1)
+        let specToEncode = GraphCoder<String, String>(graph1)
         let encodedData = try encoder.encode(specToEncode)
         let jsonString = String(data: encodedData, encoding: .utf8)!
 
         let decoder = JSONDecoder()
         let decodedData = jsonString.data(using: .utf8)!
-        let spec = try decoder.decode(GraphSpec<String, String>.self, from: decodedData)
-        let graph2 = try spec.buildGraph()
+        let spec = try decoder.decode(GraphCoder<String, String>.self, from: decodedData)
+        let graph2 = try spec.makeGraph()
 
         XCTAssertEqual(graph2.nodeCount, 2)
         XCTAssertEqual(graph2.edgeCount, 2)

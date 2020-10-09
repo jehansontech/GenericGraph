@@ -13,6 +13,7 @@ public typealias EdgeID = Int
 
 public enum GraphError: Error {
     case noSuchNode(id: NodeID)
+    case noSuchEdge(id: EdgeID)
 }
 
 public class Node<N, E> {
