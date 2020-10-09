@@ -16,6 +16,7 @@ public enum GraphError: Error {
     case noSuchEdge(id: EdgeID)
 }
 
+
 protocol GraphElement {
     associatedtype Identifier
     associatedtype ValueType
