@@ -17,10 +17,10 @@ final class BaseGraphTests: XCTestCase {
         XCTAssertEqual(n.outDegree, 0)
     }
 
-    func testSelfEdgeCreation() {
+    func testSelfEdgeCreation() throws {
         let g = Graph<Any, Any>()
         let n = g.addNode()
-        _ = g.addEdge(n, n)
+        try g.addEdge(n.id, n.id)
         XCTAssertEqual(g.nodeCount, 1)
         XCTAssertEqual(g.edgeCount, 1)
         XCTAssertEqual(n.inDegree, 1)

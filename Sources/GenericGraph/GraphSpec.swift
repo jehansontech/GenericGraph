@@ -27,7 +27,7 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
             self.outEdges = try container.decode([EdgeID].self, forKey: .outEdges)
         }
         
-        init(_ node: Graph<N,E>.Node) {
+        init(_ node: Node<N, E>) {
             self.value = node.value
             self.outEdges = [EdgeID]()
             for outEdge in node.outEdges {
@@ -53,7 +53,7 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
             self.destination = try container.decode(NodeID.self, forKey: .destination)
         }
         
-        init(_ edge: Graph<N,E>.Edge) {
+        init(_ edge: Edge<N, E>) {
             self.value = edge.value
             self.destination = edge.destination.id
         }
@@ -83,7 +83,7 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
         for node in graph.nodes.filter({ nodeIDs.contains($0.id) }) {
             self.nodes[node.id] = NodeSpec(node)
         }
-        for edge in graph.edges.filter({ nodeIDs.contains($0.source.id) && nodeIDs.contains($0.destination.id)}) {
+        for edge in graph.edges.filter({ nodeIDs.contains($0.origin.id) && nodeIDs.contains($0.destination.id)}) {
             self.edges[edge.id] = EdgeSpec(edge)
         }
     }
@@ -102,7 +102,7 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
         
         // Add all the edges
         for (nodeSpecID, nodeSpec) in self.nodes {
-            let graphSourceNodeID = nodeSpecIDToGraphNodeID[nodeSpecID]!
+            let graphOriginNodeID = nodeSpecIDToGraphNodeID[nodeSpecID]!
             for outEdgeSpecID in nodeSpec.outEdges {
                 
                 guard
@@ -117,8 +117,8 @@ public struct GraphSpec<N: Codable, E: Codable>: Codable {
                     throw GraphSpecError.noSuchNode(id: outEdgeSpec.destination)
                 }
                     
-                try graph.addEdge(sourceID: graphSourceNodeID,
-                                  destinationID: graphDestinationNodeID,
+                try graph.addEdge(graphOriginNodeID,
+                                  graphDestinationNodeID,
                                   value: outEdgeSpec.value)
             }
         }

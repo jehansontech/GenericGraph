@@ -10,10 +10,10 @@ import XCTest
 
 final class GraphSpecTests: XCTestCase {
 
-    func testSpecCreation() {
+    func testSpecCreation() throws {
         let graph = Graph<String, Int>()
         let graphNode = graph.addNode(value: "graphNode")
-        let graphEdge = graph.addEdge(graphNode, graphNode, value: 99)
+        let graphEdge = try graph.addEdge(graphNode.id, graphNode.id, value: 99)
 
         let spec = GraphSpec<String, Int>(graph)
         XCTAssertEqual(spec.nodes.count, 1)
@@ -29,8 +29,8 @@ final class GraphSpecTests: XCTestCase {
         let graph = Graph<String, String>()
         let n1 = graph.addNode(value: "n1")
         let n2 = graph.addNode(value: "n2")
-        graph.addEdge(n1, n2, value: "e1")
-        graph.addEdge(n2, n1, value: "e2")
+        try graph.addEdge(n1.id, n2.id, value: "e1")
+        try graph.addEdge(n2.id, n1.id, value: "e2")
 
         let spec = GraphSpec<String, String>(graph)
         let encoder = JSONEncoder()
@@ -76,8 +76,8 @@ final class GraphSpecTests: XCTestCase {
         let graph1 = Graph<String, String>()
         let n1 = graph1.addNode(value: "n1")
         let n2 = graph1.addNode(value: "n2")
-        graph1.addEdge(n1, n2, value: "e1")
-        graph1.addEdge(n2, n1, value: "e2")
+        try graph1.addEdge(n1.id, n2.id, value: "e1")
+        try graph1.addEdge(n2.id, n1.id, value: "e2")
         
         let encoder = JSONEncoder()
         let specToEncode = GraphSpec<String, String>(graph1)
