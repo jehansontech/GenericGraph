@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Graph+Extensions.swift
 //  
 //
 //  Created by Jim Hanson on 10/9/20.
@@ -24,24 +24,30 @@ extension Node: CustomStringConvertible {
         return inDegree + outDegree
     }
 
-    public func neighbors<N, E>(ofNode node: Node<N, E>) -> [Node<N, E>] {
-        var nbrs = [Node<N, E>]()
-        for edge in node.inEdges {
-            nbrs.append(edge.origin)
+    public func neighborhood(radius: Int) -> [NodeID: Node<N, E>] {
+        var nbhd = [NodeID: Node<N, E>]()
+    
+        if (radius >= 0) {
+            nbhd[self.id] = self
         }
-        for edge in node.outEdges {
-            nbrs.append(edge.destination)
+        
+        if (radius >= 1) {
+            nbhd.merge(neighbors(), uniquingKeysWith: { x, y in return x })
         }
-        return nbrs;
+        
+        // TODO
+        
+        return nbhd
     }
     
-}
-
-extension Graph {
-    
-    // TODO
-    // diameter
-    
-    // TODO
-    // stronglyConnectedComponents
+    public func neighbors() -> [NodeID: Node<N, E>] {
+        var nbrs = [NodeID: Node<N, E>]()
+        for edge in self.inEdges {
+            nbrs[edge.origin.id] = edge.origin
+        }
+        for edge in self.outEdges {
+            nbrs[edge.destination.id] = edge.destination
+        }
+        return nbrs
+    }
 }
