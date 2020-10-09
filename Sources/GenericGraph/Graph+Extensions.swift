@@ -59,5 +59,9 @@ extension Graph {
         return _nodes.randomElement()?.value
     }
     
+    public func randomEdge() -> Edge<N, E>? {
+        return _edges.randomElement()?.value
+    }
+    
 
 }
