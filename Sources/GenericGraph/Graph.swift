@@ -15,6 +15,36 @@ public enum GraphError: Error {
     case noSuchNode(id: NodeID)
 }
 
+
+public class NodeSequence<N, E>: Sequence, IteratorProtocol {
+    public typealias Element = Graph<N,E>.Node
+    
+    var iterator: Dictionary<NodeID, Graph<N, E>.Node>.Iterator
+    
+    init(_ nodes: [NodeID : Graph<N, E>.Node]) {
+        self.iterator = nodes.makeIterator()
+    }
+    
+    public func next() -> Graph<N, E>.Node? {
+        return iterator.next()?.value
+    }
+}
+
+public class EdgeSequence<N, E>: Sequence, IteratorProtocol {
+    public typealias Element = Graph<N, E>.Edge
+    
+    var iterator: Dictionary<EdgeID, Graph<N, E>.Edge>.Iterator
+    
+    init(_ edges: Dictionary<EdgeID, Graph<N, E>.Edge>) {
+        self.iterator = edges.makeIterator()
+    }
+    
+    public func next() -> Graph<N, E>.Edge? {
+        return iterator.next()?.value
+    }
+}
+
+
 public class Graph<N, E> {
     
     public class Node: CustomStringConvertible {
