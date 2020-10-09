@@ -195,10 +195,10 @@ public class Graph<N, E> {
             throw GraphError.noSuchNode(id: destinationID)
         }
         
-        return addEdge(origin: origin, destination: destination, value: value)
+        return addAndInstallEdge(origin, destination, value)
     }
     
-    private func addEdge(origin: Node<N, E>, destination: Node<N, E>, value: E? = nil) -> Edge<N, E> {
+    private func addAndInstallEdge(_ origin: Node<N, E>, _ destination: Node<N, E>, _ value: E?) -> Edge<N, E> {
         let id = _nextEdgeID
         _nextEdgeID += 1
         
