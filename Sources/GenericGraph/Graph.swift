@@ -16,9 +16,57 @@ public enum GraphError: Error {
     case noSuchEdge(id: EdgeID)
 }
 
-public class Node<N, E> {
+protocol GraphElement {
+    associatedtype Identifier
+    associatedtype ValueType
     
-    /// Graph-assigned identifier. Unique within any one graph.
+    var id: Identifier { get }
+    var value: ValueType? { get set }
+}
+
+
+public class Edge<N, E>: GraphElement {
+    typealias Identifier = EdgeID
+    typealias ValueType = E
+
+    /// Unique within any one graph
+    public let id: EdgeID
+    
+    public weak var origin: Node<N, E>!
+    
+    public weak var destination: Node<N, E>!
+    
+    public var value: E? = nil
+    
+    public init(_ id: EdgeID, _ origin: Node<N, E>, _ destination: Node<N, E>, _ value: E?) {
+        self.id = id
+        self.origin = origin
+        self.destination = destination
+        self.value = value
+    }
+}
+
+
+public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
+    public typealias Element = Edge<N, E>
+    
+    var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
+    
+    init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
+        self.iterator = edges.makeIterator()
+    }
+    
+    public mutating func next() -> Edge<N, E>? {
+        return iterator.next()?.value
+    }
+}
+
+
+public class Node<N, E>: GraphElement {
+    typealias Identifier = NodeID
+    typealias ValueType = N
+    
+    /// Unique within any one graph
     public let id: NodeID
     
     /// number of inbound edges
@@ -59,8 +107,8 @@ public class Node<N, E> {
     public func outEdge(withID id: EdgeID) -> Edge<N, E>? {
         return _outEdges[id]
     }
-    
 }
+
 
 public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Node<N,E>
@@ -72,39 +120,6 @@ public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     }
     
     public mutating func next() -> Node<N, E>? {
-        return iterator.next()?.value
-    }
-}
-
-public class Edge<N, E>  {
-    
-    /// Graph-assigned identifier. Unique within any one graph.
-    public let id: EdgeID
-    
-    public weak var origin: Node<N, E>!
-    
-    public weak var destination: Node<N, E>!
-    
-    public var value: E? = nil
-    
-    public init(_ id: EdgeID, _ origin: Node<N, E>, _ destination: Node<N, E>, _ value: E?) {
-        self.id = id
-        self.origin = origin
-        self.destination = destination
-        self.value = value
-    }
-}
-
-public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
-    public typealias Element = Edge<N, E>
-    
-    var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
-    
-    init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
-        self.iterator = edges.makeIterator()
-    }
-    
-    public mutating func next() -> Edge<N, E>? {
         return iterator.next()?.value
     }
 }

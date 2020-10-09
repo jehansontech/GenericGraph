@@ -28,10 +28,10 @@ Nodes keep track of both inbound and outbound edges, allowing graphs to be treat
 
 ```
 for edge in node.inEdges {
-    // do something
+    // do something using edge's data and origin
 }
 
 for edge in node.outEdges {
-    // do something else
+    // do the same thing using edge's data and destination
 }
 ```
