@@ -24,8 +24,8 @@ extension Node: CustomStringConvertible {
         return inDegree + outDegree
     }
     
-    public func neighborhood(_ radius: Int = 1) -> Neighborhood<N, E> {
-        return Neighborhood<N, E>(self)
+    public func neighborhood(radius: Int = 1) -> Neighborhood<N, E> {
+        return Neighborhood<N, E>(self, radius: radius)
     }
 }
 
