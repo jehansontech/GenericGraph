@@ -1,8 +1,8 @@
 //
-//  GraphCoder.swift
+//  Coders.swift
 //  
 //
-//  Created by James Hanson on 10/5/20.
+//  Created by Jim Hanson on 10/5/20.
 //
 
 import Foundation
@@ -79,6 +79,17 @@ public struct GraphCoder<N: Codable, E: Codable>: Codable {
         }
         for edge in graph.edges.filter({ nodeIDs.contains($0.origin.id) && nodeIDs.contains($0.destination.id)}) {
             self.edges[edge.id] = EdgeCoder(edge)
+        }
+    }
+
+    public init(_ graph: Graph<N, E>, _ nodeID: NodeID, _ radius: Int) {
+        if let neighborhood = graph.node(nodeID)?.neighborhood(radius: radius) {
+            // to build up visited
+            for _ in neighborhood {}
+            self.init(graph, neighborhood.visited)
+        }
+        else {
+            self.init()
         }
     }
 

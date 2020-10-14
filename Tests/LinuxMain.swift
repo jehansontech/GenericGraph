@@ -3,5 +3,7 @@ import XCTest
 import GraphLibTests
 
 var tests = [XCTestCaseEntry]()
-tests += GraphLibTests.allTests()
+tests += CoderTests.allTests()
+tests += GraphTests.allTests()
+tests += NeighborhoodTests.allTests()
 XCTMain(tests)

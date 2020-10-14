@@ -1,16 +1,16 @@
 //
-//  GraphSpecTests.swift
+//  CoderTests.swift
 //  
 //
-//  Created by James Hanson on 10/5/20.
+//  Created by Jim Hanson on 10/5/20.
 //
 
 import XCTest
 @testable import GenericGraph
 
-final class GraphSpecTests: XCTestCase {
+final class CoderTests: XCTestCase {
 
-    func testSpecCreation() throws {
+    func testCoderCreation() throws {
         let graph = Graph<String, Int>()
         let graphNode = graph.addNode(value: "graphNode")
         let graphEdge = try graph.addEdge(graphNode.id, graphNode.id, value: 99)
@@ -91,12 +91,12 @@ final class GraphSpecTests: XCTestCase {
 
         XCTAssertEqual(graph2.nodeCount, 2)
         XCTAssertEqual(graph2.edgeCount, 2)
-        // TODO check equality with graph1
     }
     
     static var allTests = [
-        ("testSpecCreation", testSpecCreation),
+        ("testCoderCreation", testCoderCreation),
         ("testEncoding", testEncoding),
         ("testDecoding", testDecoding),
+        ("testRoundTrip", testRoundTrip),
     ]
 }
