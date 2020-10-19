@@ -8,13 +8,13 @@
 import Foundation
 
 
+public enum StepDirection {
+    case downstream
+    case upstream
+}
+
 public struct Step<N, E> {
     
-    public enum Direction {
-        case downstream
-        case upstream
-    }
-
     public var origin: Node<N, E> {
         switch direction {
             case .downstream:
@@ -35,9 +35,9 @@ public struct Step<N, E> {
     
     public let edge: Edge<N, E>
     
-    public let direction: Step.Direction
+    public let direction: StepDirection
     
-    internal init(_ edge: Edge<N, E>, _ direction: Step.Direction) {
+    internal init(_ edge: Edge<N, E>, _ direction: StepDirection) {
         self.edge = edge
         self.direction = direction
     }
