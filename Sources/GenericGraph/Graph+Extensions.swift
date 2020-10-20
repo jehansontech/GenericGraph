@@ -24,6 +24,10 @@ extension Node: CustomStringConvertible {
         return inDegree + outDegree
     }
     
+    public func steps(inDirection dir: StepDirection? = nil) -> StepSequence<N, E> {
+        return StepSequence(self, dir)
+    }
+    
     public func neighborhood(radius: Int = 1) -> Neighborhood<N, E> {
         return Neighborhood<N, E>(self, radius: radius)
     }

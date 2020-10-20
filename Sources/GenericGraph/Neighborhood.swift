@@ -17,19 +17,19 @@ public struct Step<N, E> {
     
     public var origin: Node<N, E> {
         switch direction {
-            case .downstream:
-                return edge.origin
-            case .upstream:
-                return edge.destination
+        case .downstream:
+            return edge.origin
+        case .upstream:
+            return edge.destination
         }
     }
     
     public var destination: Node<N, E> {
         switch direction {
-            case .downstream:
-                return edge.destination
-            case .upstream:
-                return edge.origin
+        case .downstream:
+            return edge.destination
+        case .upstream:
+            return edge.origin
         }
     }
     
@@ -70,12 +70,51 @@ public struct Walk<N, E> {
         self.origin = origin
         self.path = [step]
     }
-
+    
     internal init(walk: Walk<N, E>, step: Step<N, E>) {
         self.origin = walk.origin
         var newPath = walk.path
         newPath.append(step)
         self.path = newPath
+    }
+}
+
+public struct StepSequence<N, E>: Sequence, IteratorProtocol {
+    
+    public typealias Element = Step<N, E>
+    
+    var inEdgeIterator: EdgeSequence<N,E>?
+    var outEdgeIterator: EdgeSequence<N, E>?
+    
+    init(_ node: Node<N, E>, _ stepDirection: StepDirection? = nil) {
+        if let dir =  stepDirection {
+            switch dir {
+            case .upstream:
+                inEdgeIterator = node.inEdges
+                outEdgeIterator = nil
+            case .downstream:
+                inEdgeIterator = nil
+                outEdgeIterator = node.outEdges
+            }
+        }
+        else {
+            inEdgeIterator = node.inEdges
+            outEdgeIterator = node.outEdges
+        }
+    }
+    
+    public mutating func next() -> Element? {
+        if var inIter = inEdgeIterator,
+           let inEdge = inIter.next() {
+            return Step<N, E>(inEdge, .upstream)
+        }
+        else if var outIter = outEdgeIterator,
+                let outEdge = outIter.next() {
+            return Step<N, E>(outEdge, .downstream)
+        }
+        else {
+            return nil
+        }
     }
 }
 
@@ -95,7 +134,7 @@ public struct Neighborhood<N, E>: Sequence, IteratorProtocol {
             self.next = nil
         }
     }
-
+    
     struct WalkQueue {
         
         var first: WalkQueueElem? = nil
@@ -146,7 +185,7 @@ public struct Neighborhood<N, E>: Sequence, IteratorProtocol {
     /// Queue of walks we have constructed but that have not yet been returned by next()
     private var _unvisited: WalkQueue
     
-   public init(_ origin: Node<N, E>, radius: Int = 1) {
+    public init(_ origin: Node<N, E>, radius: Int = 1) {
         self.origin = origin
         self.radius = radius
         self._unvisited = WalkQueue(Walk<N, E>(node: origin))
@@ -171,6 +210,5 @@ public struct Neighborhood<N, E>: Sequence, IteratorProtocol {
         }
         return nextElement
     }
-    
 }
 
