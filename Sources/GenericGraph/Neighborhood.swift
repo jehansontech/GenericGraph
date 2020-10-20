@@ -8,7 +8,7 @@
 import Foundation
 
 
-public enum StepDirection {
+public enum StepDirection: CaseIterable {
     case downstream
     case upstream
 }
