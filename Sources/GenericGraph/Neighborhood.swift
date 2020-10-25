@@ -104,12 +104,10 @@ public struct StepSequence<N, E>: Sequence, IteratorProtocol {
     }
     
     public mutating func next() -> Element? {
-        if var inIter = inEdgeIterator,
-           let inEdge = inIter.next() {
+        if let inEdge = inEdgeIterator?.next() {
             return Step<N, E>(inEdge, .upstream)
         }
-        else if var outIter = outEdgeIterator,
-                let outEdge = outIter.next() {
+        else if let outEdge = outEdgeIterator?.next() {
             return Step<N, E>(outEdge, .downstream)
         }
         else {
