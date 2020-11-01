@@ -11,6 +11,15 @@ import Foundation
 public enum StepDirection: CaseIterable {
     case downstream
     case upstream
+    
+    static func reverse(_ dir: StepDirection) -> StepDirection {
+        switch dir {
+        case .upstream:
+            return .downstream
+        case .downstream:
+            return .upstream
+        }
+    }
 }
 
 public struct Step<N, E> {
