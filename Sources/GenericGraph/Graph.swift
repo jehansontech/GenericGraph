@@ -56,6 +56,10 @@ public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
     
     var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
     
+    var count: Int {
+        return self.edges.count
+    }
+    
     init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
         self.edges = edges
         self.iterator = edges.makeIterator()
@@ -113,6 +117,10 @@ public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     var nodes: Dictionary<NodeID, Node<N, E>>
     
     var iterator: Dictionary<NodeID, Node<N, E>>.Iterator
+    
+    var count: Int {
+        return self.nodes.count
+    }
     
     init(_ nodes: [NodeID : Node<N, E>]) {
         self.nodes = nodes

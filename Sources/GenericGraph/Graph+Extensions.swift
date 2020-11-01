@@ -24,6 +24,44 @@ extension Node: CustomStringConvertible {
         return inDegree + outDegree
     }
     
+    public func randomStep(inDirection dir: StepDirection) -> Step<N, E>? {
+        switch dir {
+        case .downstream:
+            if let edge = _outEdges.randomElement()?.value {
+                return Step<N, E>(edge, dir)
+            }
+        case .upstream:
+            if let edge = _inEdges.randomElement()?.value {
+                return Step<N, E>(edge, dir)
+            }
+        }
+        return nil
+    }
+    
+    public func randomStep() -> Step<N, E>? {
+        if inDegree <= 0 {
+            if let edge = _outEdges.randomElement()?.value {
+                return Step<N, E>(edge, .downstream)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        if outDegree <= 0 {
+            let edge = _inEdges.randomElement()!.value
+            return Step<N, E>(edge, .upstream)
+        }
+        
+        let outEdgeBias: Float = Float(outDegree)/Float(degree)
+        if (Float.random(in: 0..<1) < outEdgeBias) {
+            return Step<N, E>(_outEdges.randomElement()!.value, .downstream)
+        }
+        else {
+            return Step<N, E>(_inEdges.randomElement()!.value, .upstream)
+        }
+    }
+    
     public func steps(inDirection dir: StepDirection? = nil) -> StepSequence<N, E> {
         return StepSequence(self, dir)
     }
