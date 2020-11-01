@@ -12,7 +12,7 @@ public enum StepDirection: CaseIterable {
     case downstream
     case upstream
     
-    static func reverse(_ dir: StepDirection) -> StepDirection {
+    public static func reverse(_ dir: StepDirection) -> StepDirection {
         switch dir {
         case .upstream:
             return .downstream
