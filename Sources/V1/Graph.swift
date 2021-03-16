@@ -21,6 +21,7 @@ public protocol GraphElement {
     associatedtype Identifier
     associatedtype ValueType
     
+    /// Does not change. Unique within the set of elements of the same type (i.e., edge or node) in any one graph
     var id: Identifier { get }
     
     var value: ValueType? { get set }
@@ -31,7 +32,6 @@ public class Edge<N, E>: GraphElement {
     public typealias Identifier = EdgeID
     public typealias ValueType = E
 
-    /// Unique within any one graph
     public let id: EdgeID
     
     public weak var origin: Node<N, E>!
@@ -52,21 +52,21 @@ public class Edge<N, E>: GraphElement {
 public struct EdgeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Edge<N, E>
     
-    var edges: Dictionary<EdgeID, Edge<N, E>>
+    internal var _edges: Dictionary<EdgeID, Edge<N, E>>
     
-    var iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
+    internal var _iterator: Dictionary<EdgeID, Edge<N, E>>.Iterator
     
     var count: Int {
-        return self.edges.count
+        return self._edges.count
     }
     
     init(_ edges: Dictionary<EdgeID, Edge<N, E>>) {
-        self.edges = edges
-        self.iterator = edges.makeIterator()
+        self._edges = edges
+        self._iterator = edges.makeIterator()
     }
     
     public mutating func next() -> Edge<N, E>? {
-        return iterator.next()?.value
+        return _iterator.next()?.value
     }
 }
 
@@ -75,7 +75,6 @@ public class Node<N, E>: GraphElement {
     public typealias Identifier = NodeID
     public typealias ValueType = N
     
-    /// Unique within any one graph
     public let id: NodeID
     
     /// number of inbound edges
@@ -114,27 +113,26 @@ public class Node<N, E>: GraphElement {
 public struct NodeSequence<N, E>: Sequence, IteratorProtocol {
     public typealias Element = Node<N,E>
     
-    var nodes: Dictionary<NodeID, Node<N, E>>
+    internal var _nodes: Dictionary<NodeID, Node<N, E>>
     
-    var iterator: Dictionary<NodeID, Node<N, E>>.Iterator
+    private var _iterator: Dictionary<NodeID, Node<N, E>>.Iterator
     
     var count: Int {
-        return self.nodes.count
+        return self._nodes.count
     }
     
     init(_ nodes: [NodeID : Node<N, E>]) {
-        self.nodes = nodes
-        self.iterator = nodes.makeIterator()
+        self._nodes = nodes
+        self._iterator = nodes.makeIterator()
     }
     
     public mutating func next() -> Node<N, E>? {
-        return iterator.next()?.value
+        return _iterator.next()?.value
     }
 }
 
 
 public class Graph<N, E> {
-    
     public var nodeCount: Int {
         return _nodes.count
     }

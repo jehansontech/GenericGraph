@@ -14,6 +14,13 @@ extension Edge: CustomStringConvertible {
     }
 }
 
+extension EdgeSequence {
+    
+    public func randomElement() -> Edge<N,E>? {
+        return _edges.randomElement()?.value
+    }
+}
+
 extension Node: CustomStringConvertible {
     
     public var description: String {
@@ -68,6 +75,13 @@ extension Node: CustomStringConvertible {
     
     public func neighborhood(radius: Int = 1) -> Neighborhood<N, E> {
         return Neighborhood<N, E>(self, radius: radius)
+    }
+}
+
+extension NodeSequence {
+    
+    public func randomElement() -> Node<N,E>? {
+        return _nodes.randomElement()?.value
     }
 }
 

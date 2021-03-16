@@ -2,132 +2,434 @@
 //  Coders.swift
 //  
 //
-//  Created by Jim Hanson on 10/5/20.
+//  Created by Jim Hanson on 3/15/21.
 //
 
 import Foundation
 
-struct NodeCoder<N: Codable, E: Codable>: Codable {
-            
-    var value: N?
-    
-    var outEdges: [EdgeID]
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.value = try container.decode(N.self, forKey: .value)
-        self.outEdges = try container.decode([EdgeID].self, forKey: .outEdges)
-    }
-    
-    init(_ node: Node<N, E>) {
-        self.value = node.value
-        self.outEdges = [EdgeID]()
-        for outEdge in node.outEdges {
-            self.outEdges.append(outEdge.id)
-        }
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case value
-        case outEdges
-    }
+
+public enum GraphCodingKeys: String, CodingKey {
+    case id
+    case value
+    case target
+    case nodes
+    case outEdges
 }
 
-struct EdgeCoder<N: Codable, E: Codable>: Codable {
-            
-    let value: E?
+
+// ===================================================
+// MARK:- Encoding delegates
+// ===================================================
+
+///
+///
+///
+public protocol EncodingDelegate: Encodable {
+    associatedtype GraphType: Graph
     
-    let destination: NodeID
+    var graph: GraphType { get }
     
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.value = try container.decode(E.self, forKey: .value)
-        self.destination = try container.decode(NodeID.self, forKey: .destination)
-    }
+    func encode(to encoder: Encoder) throws
     
-   init(_ edge: Edge<N, E>) {
-        self.value = edge.value
-        self.destination = edge.destination.id
-    }
+    func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws
+
     
-    enum CodingKeys: String, CodingKey {
-        case value
-        case destination
-    }
+    func encodeEdgeValue(_ value: GraphType.EdgeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws
+
 }
 
-public struct GraphCoder<N: Codable, E: Codable>: Codable {
+extension EncodingDelegate {
     
-    var nodes = [NodeID: NodeCoder<N, E>]()
-    
-    var edges = [EdgeID: EdgeCoder<N, E>]()
-    
-    public init() {}
-    
-    public init(_ graph: Graph<N, E>) {
+    func encode(to encoder: Encoder) throws {
+        var graphContainer = encoder.container(keyedBy: GraphCodingKeys.self)
+        var nodesContainer = graphContainer.nestedUnkeyedContainer(forKey: .nodes)
+        
         for node in graph.nodes {
-            self.nodes[node.id] = NodeCoder(node)
-        }
-        for edge in graph.edges {
-            self.edges[edge.id] = EdgeCoder(edge)
-        }
-    }
-
-    public init(_ graph: Graph<N, E>, _ nodeIDs: Set<NodeID>) {
-        for node in graph.nodes.filter({ nodeIDs.contains($0.id) }) {
-            self.nodes[node.id] = NodeCoder(node)
-        }
-        for edge in graph.edges.filter({ nodeIDs.contains($0.origin.id) && nodeIDs.contains($0.destination.id)}) {
-            self.edges[edge.id] = EdgeCoder(edge)
-        }
-    }
-
-    public init(_ graph: Graph<N, E>, _ nodeID: NodeID, _ radius: Int) {
-        if let neighborhood = graph.node(nodeID)?.neighborhood(radius: radius) {
-            // to build up visited
-            for _ in neighborhood {}
-            self.init(graph, neighborhood.visited)
-        }
-        else {
-            self.init()
-        }
-    }
-
-    public func makeGraph() throws -> Graph<N, E> {
-        let graph = Graph<N, E>()
-        
-        /// maps (node ID in coder) -> (node ID in graph)
-        var coderNodeIDToGraphNodeID = [NodeID: NodeID]()
-        
-        // Add all the nodes.
-        for (coderNodeID, nodeCoder) in self.nodes {
-            let graphNode = graph.addNode(value: nodeCoder.value)
-            coderNodeIDToGraphNodeID[coderNodeID] = graphNode.id
-        }
-        
-        // Add all the edges
-        for (coderNodeID, nodeCoder) in self.nodes {
-            let graphOriginNodeID = coderNodeIDToGraphNodeID[coderNodeID]!
-            for coderOutEdgeID in nodeCoder.outEdges {
-                
-                guard
-                    let outEdgeCoder = self.edges[coderOutEdgeID]
-                else {
-                    throw GraphError.noSuchEdge(id: coderOutEdgeID)
-                }
-
-                guard
-                    let graphDestinationNodeID = coderNodeIDToGraphNodeID[outEdgeCoder.destination]
-                else {
-                    throw GraphError.noSuchNode(id: outEdgeCoder.destination)
-                }
-                    
-                try graph.addEdge(graphOriginNodeID,
-                                  graphDestinationNodeID,
-                                  value: outEdgeCoder.value)
+            var nodeContainer = nodesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+            try nodeContainer.encode(node.id, forKey: .id)
+            try encodeNodeValue(node.value, &nodeContainer)
+            
+            var outEdgesContainer = nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
+            for edge in node.outEdges {
+                var edgeContainer = outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+                try edgeContainer.encode(edge.target.id, forKey: .target)
+                try encodeEdgeValue(edge.value, &edgeContainer)
             }
         }
+    }
+}
+
+
+///
+///
+///
+struct EncodingDelegate_NoValues<G: Graph> : EncodingDelegate {
+   
+    typealias G = GraphType
+    
+    let graph: G
+    
+    init(_ graph: G) {
+        self.graph = graph
+        print("EncodingDelegate_NoValues.init")
+    }
+    
+    func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+    }
+    
+    func encodeEdgeValue(_ value: GraphType.EdgeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+    }
+}
+
+///
+///
+///
+struct EncodingDelegate_NodeValues<G: Graph>: EncodingDelegate where G.NodeType.ValueType: Encodable {
+ 
+    typealias G = GraphType
+
+    let graph: G
+
+    init(_ graph: G) {
+        self.graph = graph
+        print("EncodingDelegate_NodeValues.init")
+    }
+    
+    func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+        try container.encodeIfPresent(value, forKey: .value)
+    }
+    
+    func encodeEdgeValue(_ value: GraphType.EdgeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+    }
+}
+
+
+///
+///
+///
+struct EncodingDelegate_EdgeValues<G: Graph>: EncodingDelegate where G.EdgeType.ValueType: Encodable {
+  
+    typealias G = GraphType
+
+    let graph: G
+
+    init(_ graph: G) {
+        self.graph = graph
+        print("EncodingDelegate_EdgeValues.init")
+    }
+    
+    func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+    }
+    
+    func encodeEdgeValue(_ value: GraphType.EdgeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+        try container.encodeIfPresent(value, forKey: .value)
+    }
+}
+
+///
+///
+///
+struct EncodingDelegate_BothValues<G: Graph>: EncodingDelegate where
+    G.NodeType.ValueType: Encodable, G.EdgeType.ValueType: Encodable {
+
+    typealias G = GraphType
+
+    let graph: G
+
+    init(_ graph: G) {
+        self.graph = graph
+        print("EncodingDelegate_BothValues.init")
+    }
+    
+    func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+        try container.encodeIfPresent(value, forKey: .value)
+    }
+    
+    func encodeEdgeValue(_ value: GraphType.EdgeType.ValueType?,
+                         _ container: inout KeyedEncodingContainer<GraphCodingKeys>) throws {
+        try container.encodeIfPresent(value, forKey: .value)
+    }
+}
+
+
+// ===================================================
+// MARK: - Graph extensions for encoding
+// ===================================================
+
+extension Graph {
+    
+    public func makeEncodingDelegate() -> some EncodingDelegate {
+        return EncodingDelegate_NoValues<Self>(self)
+    }
+}
+
+extension Graph where NodeType.ValueType: Encodable {
+
+    public func makeEncodingDelegate() -> some EncodingDelegate {
+        return EncodingDelegate_NodeValues<Self>(self)
+    }
+}
+
+extension Graph where EdgeType.ValueType: Encodable {
+
+    public func makeEncodingDelegate() -> some EncodingDelegate {
+        return EncodingDelegate_EdgeValues<Self>(self)
+    }
+}
+
+extension Graph where NodeType.ValueType: Encodable, EdgeType.ValueType: Encodable {
+
+    public func makeEncodingDelegate() -> some EncodingDelegate {
+        return EncodingDelegate_BothValues<Self>(self)
+    }
+}
+
+
+// ===================================================
+// MARK:- Decoding delegates
+// ===================================================
+
+///
+///
+///
+public protocol DecodingDelegate: Decodable {
+    associatedtype NodeValueType
+    associatedtype EdgeValueType
+    
+    var graph: BaseGraph<NodeValueType, EdgeValueType> { get }
+    
+    mutating func buildGraph(from decoder: Decoder) throws
+    
+    func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> NodeValueType?
+    
+    func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> EdgeValueType?
+    
+    func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID?
         
-        return graph
+    mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID)
+}
+
+
+///
+///
+///
+extension DecodingDelegate {
+    
+    public mutating func buildGraph(from decoder: Decoder) throws {
+        let graphContainer = try decoder.container(keyedBy: GraphCodingKeys.self)
+        var nodesContainer = try graphContainer.nestedUnkeyedContainer(forKey: .nodes)
+        while !nodesContainer.isAtEnd {
+            var nodeContainer = try nodesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+            
+            let decodedNodeID = try nodeContainer.decode(NodeID.self, forKey: .id)
+            let createdNode = findOrCreateNode(decodedNodeID)
+            createdNode.value = try decodeNodeValue(&nodeContainer)
+
+            var outEdgesContainer = try nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
+            while !outEdgesContainer.isAtEnd {
+                var edgeContainer = try outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+                
+                let decodedEdgeValue = try decodeEdgeValue(&edgeContainer)
+                let decodedTargetNodeID = try edgeContainer.decode(NodeID.self, forKey: .target)
+                
+                let targetNode = findOrCreateNode(decodedTargetNodeID)
+                print("Adding edge to graph")
+                try graph.addEdge(createdNode.id, targetNode.id, decodedEdgeValue)
+            }
+        }
+    }
+    
+    public mutating func findOrCreateNode(_ decodedNodeID: NodeID) -> BaseGraph<NodeValueType, EdgeValueType>.NodeType {
+        if let createdNodeID = getCreatedNodeID(decodedNodeID) {
+            return graph.nodes[createdNodeID]!
+        }
+        else {
+            print("Adding node to graph")
+            let createdNode = graph.addNode()
+            registerCreatedNodeID(decodedNodeID, createdNode.id)
+            return createdNode
+        }
+    }
+    
+}
+
+
+///
+///
+///
+public struct DecodingDelegate_NoValues<N, E>: DecodingDelegate {
+    public typealias NodeValueType = N
+    public typealias EdgeValueType = E
+    
+    public var graph = BaseGraph<N, E>()
+
+    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    
+    public init(from decoder: Decoder) throws {
+        print("DecodingDelegate_NoValues.init")
+        try buildGraph(from: decoder)
+    }
+    
+    public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
+        return nil
+    }
+    
+    public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
+        return nil
+    }
+    
+    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
+        return decodedToCreatedNodeIDs[decodedNodeID]
+    }
+        
+    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
+        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    }
+}
+
+
+///
+///
+///
+public struct DecodingDelegate_NodeValues<N, E>: DecodingDelegate where N: Decodable {
+    public typealias NodeValueType = N
+    public typealias EdgeValueType = E
+    
+    public var graph = BaseGraph<N, E>()
+    
+    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    
+    public init(from decoder: Decoder) throws {
+        print("DecodingDelegate_NodeValues.init")
+        try buildGraph(from: decoder)
+    }
+    
+    public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
+        return try container.decodeIfPresent(N.self, forKey: .value)
+    }
+    
+    public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
+        return nil
+    }
+    
+    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
+        return decodedToCreatedNodeIDs[decodedNodeID]
+    }
+        
+    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
+        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    }
+}
+
+
+///
+///
+///
+public struct DecodingDelegate_EdgeValues<N, E>: DecodingDelegate where E: Decodable {
+    public typealias NodeValueType = N
+    public typealias EdgeValueType = E
+    
+    public var graph = BaseGraph<N, E>()
+    
+    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    
+    public init(from decoder: Decoder) throws {
+        print("DecodingDelegate_NodeValues.init")
+        try buildGraph(from: decoder)
+    }
+    
+    public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
+        return nil
+    }
+    
+    public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
+        return try container.decodeIfPresent(E.self, forKey: .value)
+    }
+    
+    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
+        return decodedToCreatedNodeIDs[decodedNodeID]
+    }
+        
+    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
+        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    }
+}
+
+
+///
+///
+///
+public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decodable, E: Decodable {
+    public typealias NodeValueType = N
+    public typealias EdgeValueType = E
+    
+    public var graph = BaseGraph<N, E>()
+    
+    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    
+    public init(from decoder: Decoder) throws {
+        print("DecodingDelegate_NodeValues.init")
+        try buildGraph(from: decoder)
+    }
+    
+    public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
+        return try container.decodeIfPresent(N.self, forKey: .value)
+    }
+    
+    public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
+        return try container.decodeIfPresent(E.self, forKey: .value)
+    }
+    
+    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
+        return decodedToCreatedNodeIDs[decodedNodeID]
+    }
+        
+    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
+        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    }
+}
+
+
+// ===================================================
+// MARK: - BaseGraph extensions for decoding
+// ===================================================
+
+extension BaseGraph {
+    
+    public class func decodingDelegateType() -> DecodingDelegate_NoValues<N, E>.Type {
+        return DecodingDelegate_NoValues<N, E>.self
+    }
+}
+
+
+extension BaseGraph where N: Decodable {
+    
+    public class func decodingDelegateType() -> DecodingDelegate_NodeValues<N, E>.Type {
+        return DecodingDelegate_NodeValues<N, E>.self
+    }
+}
+
+
+extension BaseGraph where E: Decodable {
+    
+    public class func decodingDelegateType() -> DecodingDelegate_EdgeValues<N, E>.Type {
+        return DecodingDelegate_EdgeValues<N, E>.self
+    }
+}
+
+
+extension BaseGraph where N: Decodable, E: Decodable {
+    
+    public class func decodingDelegateType() -> DecodingDelegate_BothValues<N, E>.Type {
+        return DecodingDelegate_BothValues<N, E>.self
     }
 }

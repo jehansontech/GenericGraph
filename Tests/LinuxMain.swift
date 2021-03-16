@@ -1,9 +1,10 @@
 import XCTest
 
-import GraphLibTests
+import GenericGraphTests
 
 var tests = [XCTestCaseEntry]()
+tests += BaseGraphTests.allTests()
+tests += SubGraphTests.allTests()
+tests += TraversalTests.allTests()
 tests += CoderTests.allTests()
-tests += GraphTests.allTests()
-tests += NeighborhoodTests.allTests()
 XCTMain(tests)

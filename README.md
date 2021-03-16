@@ -1,6 +1,6 @@
 # GenericGraph
 
-GenericGraph is a Swift package for directed graphs, in which nodes and edges may contain user-defined values.
+GenericGraph is a Swift package for labeled directed multigraphs in which graph elements may contain user-defined values.
 
 ```
 let graph1 = Graph<String, Int>()
@@ -8,7 +8,7 @@ let graph2 = Graph<MyNodeValueType, MyEdgeValueType>()
 let graph3 = Graph<Any, Any>()
 ```
 
-A node's value can be supplied when the node is created and can be changed anytime. Edge values work the same way.
+A node's value may be supplied when the node is created and can be changed anytime. Edge values work the same way.
 
 ```
 var graph = Graph<String, Int>()
