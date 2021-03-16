@@ -443,7 +443,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
 ///
 extension Node {
     
-    func steps(_ heading: Heading? = nil) -> StepCollection<EdgeType> {
+    public func steps(_ heading: Heading? = nil) -> StepCollection<EdgeType> {
         return StepCollection<EdgeType>(self as! EdgeType.NodeType, heading)
     }
     
