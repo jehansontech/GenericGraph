@@ -324,7 +324,7 @@ public struct Path<EdgeType: Edge> {
 ///
 ///
 ///
-public struct Neighborhood<NodeType: Node> {
+public struct Neighborhood<NodeType: Node>: Sequence {
     public typealias Iterator = NeighborhoodTraverser<NodeType>
     
     public let origin: NodeType
