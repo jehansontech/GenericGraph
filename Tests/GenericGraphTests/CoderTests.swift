@@ -25,82 +25,66 @@ final class CoderTests: XCTestCase {
     
     let printer = GraphPrinter()
     
-    func test_encodeWithBothValues() throws {
-        let g0 = BaseGraph<String, String>()
-        let n0 = g0.addNode("n0")
-        let n1 = g0.addNode("n1")
-        let n2 = g0.addNode("n2")
-        try g0.addEdge(n0.id, n1.id, "e01")
-        try g0.addEdge(n1.id, n2.id, "e12")
-        try g0.addEdge(n2.id, n0.id, "e20")
-        
-        let delegate0 = g0.makeEncodingDelegate()
-        printString("delegate0", "\(delegate0)")
-        printString("delegate0.graph", "\(delegate0.graph)")
-        
+    func test_encodeWithNoValues() throws {
+        let graph = BaseGraph<Foo, Foo>()
+        let n0 = graph.addNode(Foo("n0"))
+        let n1 = graph.addNode(Foo("n1"))
+        let n2 = graph.addNode(Foo("n2"))
+        try graph.addEdge(n0.id, n1.id, Foo("e01"))
+        try graph.addEdge(n1.id, n2.id, Foo("e12"))
+        try graph.addEdge(n2.id, n0.id, Foo("e20"))
+
         let encoder = JSONEncoder()
-        let data0 = try encoder.encode(delegate0)
-        let json0 = String(data: data0, encoding: .utf8)!
-        printString("json0", json0)
+        let data = try encoder.encode(graph.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
     }
-    
+
     func test_encodeWithNodeValues() throws {
-        let g0 = BaseGraph<String, Foo>()
-        let n0 = g0.addNode("n0")
-        let n1 = g0.addNode("n1")
-        let n2 = g0.addNode("n2")
-        try g0.addEdge(n0.id, n1.id, Foo("e01"))
-        try g0.addEdge(n1.id, n2.id, Foo("e12"))
-        try g0.addEdge(n2.id, n0.id, Foo("e20"))
-        
-        let delegate0 = g0.makeEncodingDelegate()
-        printString("delegate0", "\(delegate0)")
-        printString("delegate0.graph", "\(delegate0.graph)")
+        let graph = BaseGraph<String, Foo>()
+        let n0 = graph.addNode("n0")
+        let n1 = graph.addNode("n1")
+        let n2 = graph.addNode("n2")
+        try graph.addEdge(n0.id, n1.id, Foo("e01"))
+        try graph.addEdge(n1.id, n2.id, Foo("e12"))
+        try graph.addEdge(n2.id, n0.id, Foo("e20"))
         
         let encoder = JSONEncoder()
-        let data0 = try encoder.encode(delegate0)
-        let json0 = String(data: data0, encoding: .utf8)!
-        printString("json0", json0)
+        let data = try encoder.encode(graph.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
     }
     
     func test_encodeWithEdgeValues() throws {
-        let g0 = BaseGraph<Foo, String>()
-        let n0 = g0.addNode(Foo("n0"))
-        let n1 = g0.addNode(Foo("n1"))
-        let n2 = g0.addNode(Foo("n2"))
-        try g0.addEdge(n0.id, n1.id, "e01")
-        try g0.addEdge(n1.id, n2.id, "e12")
-        try g0.addEdge(n2.id, n0.id, "e20")
-        
-        let delegate0 = g0.makeEncodingDelegate()
-        printString("delegate0", "\(delegate0)")
-        printString("delegate0.graph", "\(delegate0.graph)")
+        let graph = BaseGraph<Foo, String>()
+        let n0 = graph.addNode(Foo("n0"))
+        let n1 = graph.addNode(Foo("n1"))
+        let n2 = graph.addNode(Foo("n2"))
+        try graph.addEdge(n0.id, n1.id, "e01")
+        try graph.addEdge(n1.id, n2.id, "e12")
+        try graph.addEdge(n2.id, n0.id, "e20")
         
         let encoder = JSONEncoder()
-        let data0 = try encoder.encode(delegate0)
-        let json0 = String(data: data0, encoding: .utf8)!
-        printString("json0", json0)
+        let data = try encoder.encode(graph.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
     }
     
-    func test_encodeWithNoValues() throws {
-        let g0 = BaseGraph<Foo, Foo>()
-        let n0 = g0.addNode(Foo("n0"))
-        let n1 = g0.addNode(Foo("n1"))
-        let n2 = g0.addNode(Foo("n2"))
-        try g0.addEdge(n0.id, n1.id, Foo("e01"))
-        try g0.addEdge(n1.id, n2.id, Foo("e12"))
-        try g0.addEdge(n2.id, n0.id, Foo("e20"))
-        
-        let delegate0 = g0.makeEncodingDelegate()
-        printString("delegate0", "\(delegate0)")
-        printString("delegate0.graph", "\(delegate0.graph)")
-        
+    func test_encodeWithBothValues() throws {
+        let graph = BaseGraph<String, String>()
+        let n0 = graph.addNode("n0")
+        let n1 = graph.addNode("n1")
+        let n2 = graph.addNode("n2")
+        try graph.addEdge(n0.id, n1.id, "e01")
+        try graph.addEdge(n1.id, n2.id, "e12")
+        try graph.addEdge(n2.id, n0.id, "e20")
+
         let encoder = JSONEncoder()
-        let data0 = try encoder.encode(delegate0)
-        let json0 = String(data: data0, encoding: .utf8)!
-        printString("json0", json0)
+        let data = try encoder.encode(graph.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
     }
-    
+
     func test_decodeWithNoValues() throws {
         let json =
             """
@@ -130,9 +114,21 @@ final class CoderTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
-        let delegate = try decoder.decode(BaseGraph<Foo, Foo>.decodingDelegateType(), from: data)
-        let graph = delegate.graph
+        let graph = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, Foo.self), from: data).graph
         printGraph("graph", graph)
+
+        XCTAssertEqual(graph.nodes.count, 3)
+        for node in graph.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNil(node.value)
+        }
+
+        XCTAssertEqual(graph.edges.count, 3)
+        for edge in graph.edges {
+            XCTAssertNil(edge.value)
+        }
+
     }
     
     func test_decodeWithNodeValues() throws {
@@ -167,9 +163,20 @@ final class CoderTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
-        let delegate = try decoder.decode(BaseGraph<String, Foo>.decodingDelegateType(), from: data)
-        let graph = delegate.graph
+        let graph = try decoder.decode(BaseGraph.decodingDelegateType(String.self, Foo.self), from: data).graph
         printGraph("graph", graph)
+
+        XCTAssertEqual(graph.nodes.count, 3)
+        for node in graph.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNotNil(node.value)
+        }
+
+        XCTAssertEqual(graph.edges.count, 3)
+        for edge in graph.edges {
+            XCTAssertNil(edge.value)
+        }
     }
     
     func test_decodeWithEdgeValues() throws {
@@ -201,9 +208,20 @@ final class CoderTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
-        let delegate = try decoder.decode(BaseGraph<Foo, String>.decodingDelegateType(), from: data)
-        let graph = delegate.graph
+        let graph = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, String.self), from: data).graph
         printGraph("graph", graph)
+
+        XCTAssertEqual(graph.nodes.count, 3)
+        for node in graph.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNil(node.value)
+        }
+
+        XCTAssertEqual(graph.edges.count, 3)
+        for edge in graph.edges {
+            XCTAssertNotNil(edge.value)
+        }
     }
 
     func test_decodeWithBothValues() throws {
@@ -238,17 +256,153 @@ final class CoderTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
-        let delegate = try decoder.decode(BaseGraph<String, String>.decodingDelegateType(), from: data)
-        let graph = delegate.graph
+        let graph = try decoder.decode(BaseGraph.decodingDelegateType(String.self, String.self), from: data).graph
         printGraph("graph", graph)
+
+        XCTAssertEqual(graph.nodes.count, 3)
+        for node in graph.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNotNil(node.value)
+        }
+
+        XCTAssertEqual(graph.edges.count, 3)
+        for edge in graph.edges {
+            XCTAssertNotNil(edge.value)
+        }
     }
 
-    func printString(_ label: String, _ s: String) {
+    func test_roundTripWithNoValues() throws {
+        let graph1 = BaseGraph<Foo, Foo>()
+        let n0 = graph1.addNode(Foo("n0"))
+        let n1 = graph1.addNode(Foo("n1"))
+        let n2 = graph1.addNode(Foo("n2"))
+        try graph1.addEdge(n0.id, n1.id, Foo("e01"))
+        try graph1.addEdge(n1.id, n2.id, Foo("e12"))
+        try graph1.addEdge(n2.id, n0.id, Foo("e20"))
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(graph1.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
+
+        let decoder = JSONDecoder()
+        let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, Foo.self), from: data).graph
+        printGraph("graph2", graph2)
+
+        XCTAssertEqual(graph2.nodes.count, 3)
+        for node in graph2.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNil(node.value)
+        }
+
+        XCTAssertEqual(graph2.edges.count, 3)
+        for edge in graph2.edges {
+            XCTAssertNil(edge.value)
+        }
+    }
+
+    func test_roundTripWithNodeValues() throws {
+        let graph1 = BaseGraph<String, Foo>()
+        let n0 = graph1.addNode("n0")
+        let n1 = graph1.addNode("n1")
+        let n2 = graph1.addNode("n2")
+        try graph1.addEdge(n0.id, n1.id, Foo("e01"))
+        try graph1.addEdge(n1.id, n2.id, Foo("e12"))
+        try graph1.addEdge(n2.id, n0.id, Foo("e20"))
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(graph1.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
+
+        let decoder = JSONDecoder()
+        let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(String.self, Foo.self), from: data).graph
+        printGraph("graph2", graph2)
+
+        XCTAssertEqual(graph2.nodes.count, 3)
+        for node in graph2.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNotNil(node.value)
+        }
+
+        XCTAssertEqual(graph2.edges.count, 3)
+        for edge in graph2.edges {
+            XCTAssertNil(edge.value)
+        }
+    }
+
+    func test_roundTripWithEdgeValues() throws {
+        let graph1 = BaseGraph<Foo, String>()
+        let n0 = graph1.addNode(Foo("n0"))
+        let n1 = graph1.addNode(Foo("n1"))
+        let n2 = graph1.addNode(Foo("n2"))
+        try graph1.addEdge(n0.id, n1.id, "e01")
+        try graph1.addEdge(n1.id, n2.id, "e12")
+        try graph1.addEdge(n2.id, n0.id, "e20")
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(graph1.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
+
+        let decoder = JSONDecoder()
+        let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, String.self), from: data).graph
+        printGraph("graph2", graph2)
+
+        XCTAssertEqual(graph2.nodes.count, 3)
+        for node in graph2.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNil(node.value)
+        }
+
+        XCTAssertEqual(graph2.edges.count, 3)
+        for edge in graph2.edges {
+            XCTAssertNotNil(edge.value)
+        }
+    }
+
+    func test_roundTripWithBothValues() throws {
+        let graph1 = BaseGraph<String, String>()
+        let n0 = graph1.addNode("n0")
+        let n1 = graph1.addNode("n1")
+        let n2 = graph1.addNode("n2")
+        try graph1.addEdge(n0.id, n1.id, "e01")
+        try graph1.addEdge(n1.id, n2.id, "e12")
+        try graph1.addEdge(n2.id, n0.id, "e20")
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(graph1.makeEncodingDelegate())
+        let json = String(data: data, encoding: .utf8)!
+        printString("json", json)
+
+        let decoder = JSONDecoder()
+        let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(String.self, String.self), from: data).graph
+        printGraph("graph2", graph2)
+
+        XCTAssertEqual(graph2.nodes.count, 3)
+        for node in graph2.nodes {
+            XCTAssertEqual(node.inDegree, 1)
+            XCTAssertEqual(node.outDegree, 1)
+            XCTAssertNotNil(node.value)
+        }
+
+        XCTAssertEqual(graph2.edges.count, 3)
+        for edge in graph2.edges {
+            XCTAssertNotNil(edge.value)
+        }
+    }
+
+
+    private func printString(_ label: String, _ s: String) {
         printer.printString("---- \(label) ----", 0)
         printer.printString(s, 1)
     }
     
-    func printGraph<GraphType: Graph>(_ label: String, _ graph: GraphType) {
+    private func printGraph<GraphType: Graph>(_ label: String, _ graph: GraphType) {
         printer.printString("---- \(label) ----", 0)
         printer.printGraph(graph, 1)
         
@@ -262,7 +416,11 @@ final class CoderTests: XCTestCase {
         ("test_decodeWithNoValues", test_decodeWithNoValues),
         ("test_decodeWithNodeValues", test_decodeWithNodeValues),
         ("test_decodeWithEdgeValues", test_decodeWithEdgeValues),
-        ("test_decodeWithBothValues", test_decodeWithBothValues)
+        ("test_roundTripWithBothValues", test_roundTripWithBothValues),
+        ("test_roundTripWithNoValues", test_roundTripWithNoValues),
+        ("test_roundTripWithNodeValues", test_roundTripWithNodeValues),
+        ("test_roundTripWithEdgeValues", test_roundTripWithEdgeValues),
+        ("test_roundTripWithBothValues", test_roundTripWithBothValues)
     ]
 
 }

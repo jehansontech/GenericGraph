@@ -73,7 +73,6 @@ struct EncodingDelegate_NoValues<G: Graph> : EncodingDelegate {
     
     init(_ graph: G) {
         self.graph = graph
-        print("EncodingDelegate_NoValues.init")
     }
     
     func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
@@ -96,7 +95,6 @@ struct EncodingDelegate_NodeValues<G: Graph>: EncodingDelegate where G.NodeType.
 
     init(_ graph: G) {
         self.graph = graph
-        print("EncodingDelegate_NodeValues.init")
     }
     
     func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
@@ -121,7 +119,6 @@ struct EncodingDelegate_EdgeValues<G: Graph>: EncodingDelegate where G.EdgeType.
 
     init(_ graph: G) {
         self.graph = graph
-        print("EncodingDelegate_EdgeValues.init")
     }
     
     func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
@@ -146,7 +143,6 @@ struct EncodingDelegate_BothValues<G: Graph>: EncodingDelegate where
 
     init(_ graph: G) {
         self.graph = graph
-        print("EncodingDelegate_BothValues.init")
     }
     
     func encodeNodeValue(_ value: GraphType.NodeType.ValueType?,
@@ -242,7 +238,6 @@ extension DecodingDelegate {
                 let decodedTargetNodeID = try edgeContainer.decode(NodeID.self, forKey: .target)
                 
                 let targetNode = findOrCreateNode(decodedTargetNodeID)
-                print("Adding edge to graph")
                 try graph.addEdge(createdNode.id, targetNode.id, decodedEdgeValue)
             }
         }
@@ -253,7 +248,6 @@ extension DecodingDelegate {
             return graph.nodes[createdNodeID]!
         }
         else {
-            print("Adding node to graph")
             let createdNode = graph.addNode()
             registerCreatedNodeID(decodedNodeID, createdNode.id)
             return createdNode
@@ -275,7 +269,6 @@ public struct DecodingDelegate_NoValues<N, E>: DecodingDelegate {
     private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
     
     public init(from decoder: Decoder) throws {
-        print("DecodingDelegate_NoValues.init")
         try buildGraph(from: decoder)
     }
     
@@ -309,7 +302,6 @@ public struct DecodingDelegate_NodeValues<N, E>: DecodingDelegate where N: Decod
     private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
     
     public init(from decoder: Decoder) throws {
-        print("DecodingDelegate_NodeValues.init")
         try buildGraph(from: decoder)
     }
     
@@ -343,7 +335,6 @@ public struct DecodingDelegate_EdgeValues<N, E>: DecodingDelegate where E: Decod
     private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
     
     public init(from decoder: Decoder) throws {
-        print("DecodingDelegate_NodeValues.init")
         try buildGraph(from: decoder)
     }
     
@@ -377,16 +368,17 @@ public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decod
     private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
     
     public init(from decoder: Decoder) throws {
-        print("DecodingDelegate_NodeValues.init")
         try buildGraph(from: decoder)
     }
     
     public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
-        return try container.decodeIfPresent(N.self, forKey: .value)
+        var nodeValue = try container.decodeIfPresent(N.self, forKey: .value)
+        return nodeValue
     }
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
-        return try container.decodeIfPresent(E.self, forKey: .value)
+        var edgeValue = try container.decodeIfPresent(E.self, forKey: .value)
+        return edgeValue
     }
     
     public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
@@ -404,8 +396,9 @@ public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decod
 // ===================================================
 
 extension BaseGraph {
-    
-    public class func decodingDelegateType() -> DecodingDelegate_NoValues<N, E>.Type {
+
+
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_NoValues<N, E>.Type {
         return DecodingDelegate_NoValues<N, E>.self
     }
 }
@@ -413,7 +406,7 @@ extension BaseGraph {
 
 extension BaseGraph where N: Decodable {
     
-    public class func decodingDelegateType() -> DecodingDelegate_NodeValues<N, E>.Type {
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_NodeValues<N, E>.Type {
         return DecodingDelegate_NodeValues<N, E>.self
     }
 }
@@ -421,7 +414,7 @@ extension BaseGraph where N: Decodable {
 
 extension BaseGraph where E: Decodable {
     
-    public class func decodingDelegateType() -> DecodingDelegate_EdgeValues<N, E>.Type {
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_EdgeValues<N, E>.Type {
         return DecodingDelegate_EdgeValues<N, E>.self
     }
 }
@@ -429,7 +422,7 @@ extension BaseGraph where E: Decodable {
 
 extension BaseGraph where N: Decodable, E: Decodable {
     
-    public class func decodingDelegateType() -> DecodingDelegate_BothValues<N, E>.Type {
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_BothValues<N, E>.Type {
         return DecodingDelegate_BothValues<N, E>.self
     }
 }
