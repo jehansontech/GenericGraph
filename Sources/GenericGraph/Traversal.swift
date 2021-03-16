@@ -71,7 +71,7 @@ public class Step<EdgeType: Edge> {
     
     internal let _edge: EdgeType
     
-    init(_ edge: EdgeType, _ heading: Heading) {
+    public init(_ edge: EdgeType, _ heading: Heading) {
         self._edge = edge
         self.heading = heading
     }
@@ -93,7 +93,7 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     
     internal weak var _node: EdgeType.NodeType!
     
-    init(_ node: EdgeType.NodeType, _ heading: Heading?) {
+    public init(_ node: EdgeType.NodeType, _ heading: Heading?) {
         self._node = node
         self.heading = heading
     }
@@ -221,7 +221,7 @@ public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
     
     internal var _outEdgeIterator: EdgeType.NodeType.OutEdgeCollectionType.Iterator? = nil
     
-    init(_ node: EdgeType.NodeType, _ heading: Heading?) {
+    public init(_ node: EdgeType.NodeType, _ heading: Heading?) {
         if (heading == nil || heading! == .upstream) {
             self._inEdgeIterator = node.inEdges.makeIterator()
         }
@@ -284,7 +284,7 @@ public struct Path<EdgeType: Edge> {
     
     internal var _steps: [Step<EdgeType>]
     
-    init(_ origin: EdgeType.NodeType) {
+    public init(_ origin: EdgeType.NodeType) {
         self._origin = origin
         self._steps = [Step<EdgeType>]()
     }
@@ -333,7 +333,7 @@ public struct Neighborhood<NodeType: Node> {
 
     public let heading: Heading?
     
-    init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
+    public init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
         self.origin = origin
         self.radius = radius
         self.heading = heading
@@ -357,7 +357,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
         
         var next: FrontierElement? = nil
         
-        init(_ path: Path<NodeType.EdgeType>) {
+        public init(_ path: Path<NodeType.EdgeType>) {
             self.path = path
         }
     }
@@ -401,7 +401,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
     
     private var _visited = Set<NodeID>()
     
-    init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
+    public init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
         self._radius = radius
         self._heading = heading
         push(Path<NodeType.EdgeType>(origin as! NodeType.EdgeType.NodeType))

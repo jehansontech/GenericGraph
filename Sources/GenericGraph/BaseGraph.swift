@@ -87,7 +87,7 @@ public struct BaseGraphNodeIterator<N, E>: IteratorProtocol {
 
     internal var _innerIterator: Dictionary<NodeID, BaseGraphNode<N, E>>.Iterator
     
-    init(_ nodes: BaseGraphNodeCollection<N, E>) {
+    public init(_ nodes: BaseGraphNodeCollection<N, E>) {
         self._innerIterator = nodes._dict.makeIterator()
     }
 
@@ -125,7 +125,7 @@ public class BaseGraphEdge<N, E>: Edge {
     
     internal weak var _target: BaseGraphNode<N, E>!
     
-    init(_ id: EdgeID, _ value: E?, _ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>) {
+    public init(_ id: EdgeID, _ value: E?, _ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>) {
         self.id = id
         self.value = value
         self._source = source
