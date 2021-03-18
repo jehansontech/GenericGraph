@@ -11,8 +11,11 @@ The node and edge values are generic types.
 The fundamental type of graph is BaseGraph
 
 ```
+/// create a graph with Strings for node values and Ints for edge values
 let graph1 = BaseGraph<String, Int>()
+
 let graph2 = BaseGraph<MyNodeValueType, MyEdgeValueType>()
+
 let graph3 = BaseGraph<Any, Any>()
 ```
 
@@ -20,27 +23,30 @@ Nodes are created by the BaseGraph that contains them.
 You can set a node's value when it is created and change it anytime thereafter.
 
 ```
-/// create a new node in graph1
 var node1 = graph1.addNode("my first node")
 
-/// node2's value is initially nil
-var node2 = graph1.addNode()
+var node2 = graph1.addNode() // node2's value is nil
 node2.value = "another node"
 ```
 
 Edges work the same way.
-Note that edges are directed.
 
 ```
-/// create a new edge from node1 to node2
 var edge1 = graph1.addEdge(node1.id, node2.id, 101)
 
-/// edge2's value is initially nil
-var edge2 = graph1.addEdge(node2.id, node1.id)
+var edge2 = graph1.addEdge(node2.id, node1.id) 
 edge2.value = 102
 ```
 
-Nodes keep track of both inbound and outbound edges, allowing graphs to be treated as undirected.
+Edges are directed.
+
+```
+var source1 = edge1.source // same as node1
+var target1 = edge1.target // same as node2
+```
+
+Nodes keep track of both inbound and outbound edges.
+This permits to be treated as undirected.
 
 ```
 for edge in node1.inEdges {
@@ -67,13 +73,11 @@ You can create a subgraph of any graph.
 The subgraph's nodes may be provided at creation time, or may be added later.
 
 ```
-/// create a subgraph of graph1 containing both its nodes
-let subgraph1Nodes = Set<NodeID>()
-subgraph1Nodes.insert(node1.id)
-subgraph1Nodes.insert(node2.id)
-let subgraph1 = graph1.subgraph(subgraph1Nodes)
+let nodeIDs = Set<NodeID>()
+nodeIDs.insert(node1.id)
+nodeIDs.insert(node2.id)
+let subgraph1 = graph1.subgraph(nodeIDs)
 
-/// create an empty subgraph of subgraph1, then add a node to it
 let subgraph2 = subgraph1.subgraph()
 subgraph2.addNode(node1.id)
 ```
