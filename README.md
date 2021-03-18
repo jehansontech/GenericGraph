@@ -2,7 +2,7 @@
 
 Latest Version: 0.2.0
 
-GenericGraph is a Swift package for labeled multigraphs.
+GenericGraph is a Swift package providing support for mathematical graph structures. 
 It uses terminology "nodes" and "edges" for graph elements, and "values" for labels.
 The node and edge values are generic types.
 
