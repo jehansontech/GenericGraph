@@ -127,8 +127,8 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
         
     private func randomForwardStep() -> Step<EdgeType>? {
-        if let randomOutEdge = _node.outEdges.randomElement() as? EdgeType {
-            return Step(randomOutEdge, .backward)
+        if let edge = _node.outEdges.randomElement() as? EdgeType {
+            return Step(edge, .forward)
         }
         else {
             return nil
@@ -136,8 +136,8 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
     
     private func randomBackwardStep() -> Step<EdgeType>? {
-        if let randomInEdge = _node.inEdges.randomElement() as? EdgeType {
-            return Step(randomInEdge, .forward)
+        if let edge = _node.inEdges.randomElement() as? EdgeType {
+            return Step(edge, .backward)
         }
         else {
             return nil
@@ -176,7 +176,7 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
 
     private func forwardStep(withID id: EdgeID) -> Step<EdgeType>? {
-        if let edge = _node.inEdges[id] as? EdgeType {
+        if let edge = _node.outEdges[id] as? EdgeType {
             return Step<EdgeType>(edge, .forward)
         }
         else {
@@ -185,7 +185,7 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
 
     private func backwardStep(withID id: EdgeID) -> Step<EdgeType>? {
-        if let edge = _node.outEdges[id] as? EdgeType {
+        if let edge = _node.inEdges[id] as? EdgeType {
             return Step<EdgeType>(edge, .backward)
         }
         else {
@@ -217,10 +217,10 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
 public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
     public typealias Element = Step<EdgeType>
 
-    internal var _inEdgeIterator: EdgeType.NodeType.InEdgeCollectionType.Iterator? = nil
-    
     internal var _outEdgeIterator: EdgeType.NodeType.OutEdgeCollectionType.Iterator? = nil
     
+    internal var _inEdgeIterator: EdgeType.NodeType.InEdgeCollectionType.Iterator? = nil
+
     public init(_ node: EdgeType.NodeType, _ direction: Direction?) {
         if (direction == nil || direction! == .forward) {
             self._outEdgeIterator = node.outEdges.makeIterator()
