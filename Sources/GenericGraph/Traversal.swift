@@ -113,8 +113,8 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
     
     public func randomElement() -> Step<EdgeType>? {
-        if let heading = direction {
-            switch heading {
+        if let direction = direction {
+            switch direction {
             case .forward:
                 return randomForwardStep()
             case .backward:
@@ -162,8 +162,8 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
 
     public subscript(_ id: EdgeID) -> Step<EdgeType>? {
-        if let heading = direction {
-            switch heading {
+        if let direction = direction {
+            switch direction {
             case .forward:
                 return forwardStep(withID: id)
             case .backward:
@@ -195,10 +195,10 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
 
     private func anyStep(withID id: EdgeID) -> Step<EdgeType>? {
         if let edge = _node.outEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .backward)
+            return Step<EdgeType>(edge, .forward)
         }
         else if let edge = _node.inEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .forward)
+            return Step<EdgeType>(edge, .backward)
         }
         else {
             return nil
