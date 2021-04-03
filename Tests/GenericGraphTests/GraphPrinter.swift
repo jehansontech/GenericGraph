@@ -150,7 +150,7 @@ struct GraphPrinter {
             else {
                 printString("edgeValue = nil", level)
             }
-            printString("heading = \(step.heading)", level)
+            printString("direction = \(step.direction)", level)
             if (level < depth) {
                 printString("origin:", level)
                 printNode(step.origin, level+1, depth)

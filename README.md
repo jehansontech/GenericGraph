@@ -1,8 +1,8 @@
 # GenericGraph
 
-Latest Version: 0.2.0
+Latest Version: 1.0.2
 
-GenericGraph is a Swift package providing support for mathematical graph structures. 
+GenericGraph is a Swift package providing support for labeled directed multigraphs. 
 It uses terminology "nodes" and "edges" for graph elements, and "values" for labels.
 The node and edge values are generic types.
 
@@ -41,20 +41,19 @@ edge2.value = 102
 Edges are directed.
 
 ```
-var source1 = edge1.source // same as node1
-var target1 = edge1.target // same as node2
+var source1 = edge1.source // node1
+var target1 = edge1.target // node2
 ```
 
-Nodes keep track of both inbound and outbound edges.
-This permits to be treated as undirected.
+Nodes keep track of their outbound and inbound edges. This permits graphs to be treated as undirected.
 
 ```
-for edge in node1.inEdges {
+for edge in node1.outEdges {
     // do something 
 }
 
-for edge in node1.outEdges {
-    // do something 
+for edge in node1.inEdges {
+// do something 
 }
 ```
 

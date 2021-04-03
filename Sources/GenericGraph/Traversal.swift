@@ -16,16 +16,16 @@ import Foundation
 ///
 ///
 ///
-public enum Heading: String, CaseIterable {
-    case downstream
-    case upstream
+public enum Direction: String, CaseIterable {
+    case forward
+    case backward
 
-    public static func reverse(_ dir: Heading) -> Heading {
+    public static func reverse(_ dir: Direction) -> Direction {
         switch dir {
-        case .upstream:
-            return .downstream
-        case .downstream:
-            return .upstream
+        case .forward:
+            return .backward
+        case .backward:
+            return .forward
         }
     }
 }
@@ -49,31 +49,31 @@ public class Step<EdgeType: Edge> {
         }
     }
     
-    public let heading: Heading
+    public let direction: Direction
     
     public var origin: EdgeType.NodeType {
-        switch heading {
-        case .upstream:
-            return _edge.target
-        case .downstream:
+        switch direction {
+        case .forward:
             return _edge.source
+        case .backward:
+            return _edge.target
         }
     }
     
     public var destination: EdgeType.NodeType {
-        switch heading {
-        case .upstream:
-            return _edge.source
-        case .downstream:
+        switch direction {
+        case .forward:
             return _edge.target
+        case .backward:
+            return _edge.source
         }
     }
     
     internal let _edge: EdgeType
     
-    public init(_ edge: EdgeType, _ heading: Heading) {
+    public init(_ edge: EdgeType, _ direction: Direction) {
         self._edge = edge
-        self.heading = heading
+        self.direction = direction
     }
 }
 
@@ -86,25 +86,25 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     public typealias Iterator = StepIterator<EdgeType>
     
     public var count: Int {
-        return _node.inEdges.count + _node.outEdges.count
+        return _node.outEdges.count + _node.inEdges.count
     }
     
-    public let heading: Heading?
+    public let direction: Direction?
     
     internal weak var _node: EdgeType.NodeType!
     
-    public init(_ node: EdgeType.NodeType, _ heading: Heading?) {
+    public init(_ node: EdgeType.NodeType, _ direction: Direction?) {
         self._node = node
-        self.heading = heading
+        self.direction = direction
     }
     
     public func contains(_ id: EdgeID) -> Bool {
-        if let heading = heading {
-            switch heading {
-            case .upstream:
-                return _node.inEdges.contains(id)
-            case .downstream:
+        if let direction = direction {
+            switch direction {
+            case .forward:
                 return _node.outEdges.contains(id)
+            case .backward:
+                return _node.inEdges.contains(id)
             }
         }
         else {
@@ -113,92 +113,92 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
     
     public func randomElement() -> Step<EdgeType>? {
-        if let heading = heading {
+        if let heading = direction {
             switch heading {
-            case .upstream:
-                return randomUpstream()
-            case .downstream:
-                return randomDownstream()
+            case .forward:
+                return randomForwardStep()
+            case .backward:
+                return randomBackwardStep()
             }
         }
         else {
-            return randomAnyHeading()
+            return randomAnyDirection()
         }
     }
         
-    private func randomAnyHeading() -> Step<EdgeType>? {
-        let inDegree = _node.inEdges.count
-        let outDegree = _node.outEdges.count
-        if inDegree + outDegree == 0 {
-            return nil
-        }
-        else {
-            let downstreamBias = Float(outDegree)/Float(outDegree + inDegree)
-            if (Float.random(in: 0..<1) < downstreamBias) {
-                return randomDownstream()
-            }
-            else {
-                return randomUpstream()
-            }
-        }
-    }
-
-    private func randomUpstream() -> Step<EdgeType>? {
-        if let randomInEdge = _node.inEdges.randomElement() as? EdgeType {
-            return Step(randomInEdge, .upstream)
-        }
-        else {
-            return nil
-        }
-    }
-
-    private func randomDownstream() -> Step<EdgeType>? {
+    private func randomForwardStep() -> Step<EdgeType>? {
         if let randomOutEdge = _node.outEdges.randomElement() as? EdgeType {
-            return Step(randomOutEdge, .downstream)
+            return Step(randomOutEdge, .backward)
         }
         else {
             return nil
         }
     }
     
+    private func randomBackwardStep() -> Step<EdgeType>? {
+        if let randomInEdge = _node.inEdges.randomElement() as? EdgeType {
+            return Step(randomInEdge, .forward)
+        }
+        else {
+            return nil
+        }
+    }
+
+    private func randomAnyDirection() -> Step<EdgeType>? {
+        let inDegree = _node.inEdges.count
+        let outDegree = _node.outEdges.count
+        if inDegree + outDegree == 0 {
+            return nil
+        }
+        else {
+            let forwardBias = Float(outDegree)/Float(outDegree + inDegree)
+            if (Float.random(in: 0..<1) < forwardBias) {
+                return randomForwardStep()
+            }
+            else {
+                return randomBackwardStep()
+            }
+        }
+    }
+
     public subscript(_ id: EdgeID) -> Step<EdgeType>? {
-        if let heading = heading {
+        if let heading = direction {
             switch heading {
-            case .upstream:
-                return getUpstream(id)
-            case .downstream:
-                return getDownstream(id)
+            case .forward:
+                return forwardStep(withID: id)
+            case .backward:
+                return backwardStep(withID: id)
             }
         }
         else {
-            return getAnyHeading(id)
+            return anyStep(withID: id)
         }
     }
 
-    private func getUpstream(_ id: EdgeID) -> Step<EdgeType>? {
+    private func forwardStep(withID id: EdgeID) -> Step<EdgeType>? {
         if let edge = _node.inEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .upstream)
+            return Step<EdgeType>(edge, .forward)
         }
         else {
             return nil
         }
     }
 
-    private func getDownstream(_ id: EdgeID) -> Step<EdgeType>? {
+    private func backwardStep(withID id: EdgeID) -> Step<EdgeType>? {
         if let edge = _node.outEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .downstream)
+            return Step<EdgeType>(edge, .backward)
         }
         else {
             return nil
         }
     }
 
-    private func getAnyHeading(_ id: EdgeID) -> Step<EdgeType>? {
+    private func anyStep(withID id: EdgeID) -> Step<EdgeType>? {
         if let edge = _node.outEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .downstream)
+            return Step<EdgeType>(edge, .backward)
         }
         else if let edge = _node.inEdges[id] as? EdgeType {
-            return Step<EdgeType>(edge, .upstream)
+            return Step<EdgeType>(edge, .forward)
         }
         else {
             return nil
@@ -206,7 +206,7 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
     }
 
     public func makeIterator() -> StepIterator<EdgeType> {
-        return StepIterator<EdgeType>(_node, heading)
+        return StepIterator<EdgeType>(_node, direction)
     }
 }
 
@@ -221,21 +221,22 @@ public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
     
     internal var _outEdgeIterator: EdgeType.NodeType.OutEdgeCollectionType.Iterator? = nil
     
-    public init(_ node: EdgeType.NodeType, _ heading: Heading?) {
-        if (heading == nil || heading! == .upstream) {
-            self._inEdgeIterator = node.inEdges.makeIterator()
-        }
-        if (heading == nil || heading! == .downstream) {
+    public init(_ node: EdgeType.NodeType, _ direction: Direction?) {
+        if (direction == nil || direction! == .forward) {
             self._outEdgeIterator = node.outEdges.makeIterator()
+        }
+        if (direction == nil || direction! == .backward) {
+            self._inEdgeIterator = node.inEdges.makeIterator()
         }
     }
     
     public mutating func next() -> Step<EdgeType>? {
-        if let nextInEdge = _inEdgeIterator?.next() as? EdgeType {
-            return Step<EdgeType>(nextInEdge, .upstream)
+
+        if let nextOutEdge = _outEdgeIterator?.next() as? EdgeType {
+            return Step<EdgeType>(nextOutEdge, .forward)
         }
-        else if let nextOutEdge = _outEdgeIterator?.next() as? EdgeType {
-            return Step<EdgeType>(nextOutEdge, .downstream)
+        else if let nextInEdge = _inEdgeIterator?.next() as? EdgeType {
+            return Step<EdgeType>(nextInEdge, .backward)
         }
         else {
             return nil
@@ -294,7 +295,7 @@ public struct Path<EdgeType: Edge> {
         self._steps = steps
     }
 
-    public func extend(_ step: Step<EdgeType>) throws -> Path<EdgeType> {
+    public func append(_ step: Step<EdgeType>) throws -> Path<EdgeType> {
         if self.destination.id != step.origin.id {
             throw PathError.disconnectedPath(destination1: self.destination.id, origin2: step.origin.id)
         }
@@ -303,7 +304,7 @@ public struct Path<EdgeType: Edge> {
         return newPath
     }
     
-    public func extend(_ path: Path<EdgeType>) throws -> Path<EdgeType> {
+    public func append(_ path: Path<EdgeType>) throws -> Path<EdgeType> {
         if self.destination.id != path.origin.id {
             throw PathError.disconnectedPath(destination1: self.destination.id, origin2: path.origin.id)
         }
@@ -331,16 +332,16 @@ public struct Neighborhood<NodeType: Node>: Sequence {
     
     public let radius: Int
 
-    public let heading: Heading?
+    public let direction: Direction?
     
-    public init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
+    public init(_ origin: NodeType, _ radius: Int, _ direction: Direction?) {
         self.origin = origin
         self.radius = radius
-        self.heading = heading
+        self.direction = direction
     }
 
     public func makeIterator() -> NeighborhoodTraverser<NodeType> {
-        return NeighborhoodTraverser<NodeType>(origin, radius, heading)
+        return NeighborhoodTraverser<NodeType>(origin, radius, direction)
     }
 }
 
@@ -393,27 +394,27 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
         }
     }
         
-    private let _radius: Int
+    public let radius: Int
     
-    private let _heading: Heading?
+    public let direction: Direction?
     
     private var _frontier = Frontier()
     
     private var _visited = Set<NodeID>()
     
-    public init(_ origin: NodeType, _ radius: Int, _ heading: Heading?) {
-        self._radius = radius
-        self._heading = heading
+    public init(_ origin: NodeType, _ radius: Int, _ direction: Direction?) {
+        self.radius = radius
+        self.direction = direction
         push(Path<NodeType.EdgeType>(origin as! NodeType.EdgeType.NodeType))
     }
     
     public mutating func next() -> Path<NodeType.EdgeType>? {
         if let path = pop() {
-            if path.length < _radius {
-                let steps = StepCollection<NodeType.EdgeType>(path.origin, _heading)
+            if path.length < radius {
+                let steps = StepCollection<NodeType.EdgeType>(path.origin, direction)
                 for step in steps {
                     if !_visited.contains(step.destination.id) {
-                        try! push(path.extend(step))
+                        try! push(path.append(step))
                     }
                 }
             }
@@ -443,12 +444,12 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
 ///
 extension Node {
     
-    public func steps(_ heading: Heading? = nil) -> StepCollection<EdgeType> {
-        return StepCollection<EdgeType>(self as! EdgeType.NodeType, heading)
+    public func steps(_ direction: Direction? = nil) -> StepCollection<EdgeType> {
+        return StepCollection<EdgeType>(self as! EdgeType.NodeType, direction)
     }
     
-    public func neighborhood(_ radius: Int, _ heading: Heading? = nil) -> Neighborhood<Self> {
-        return Neighborhood<Self>(self, radius, heading)
+    public func neighborhood(_ radius: Int, _ direction: Direction? = nil) -> Neighborhood<Self> {
+        return Neighborhood<Self>(self, radius, direction)
     }
 }
 
@@ -462,7 +463,7 @@ extension Node {
 ///
 extension Graph {
         
-    public func reachableFrom(nodeID: NodeID, _ heading: Heading? = nil) -> Set<NodeID> {
+    public func reachableFrom(nodeID: NodeID, _ direction: Direction? = nil) -> Set<NodeID> {
         var reached = Set<NodeID>()
         var frontier = Set<NodeID>()
         frontier.insert(nodeID)
@@ -470,12 +471,12 @@ extension Graph {
             let nodeID = frontier.removeFirst()
             if !reached.contains(nodeID), let node = self.nodes[nodeID]  {
                 reached.insert(nodeID)
-                if (heading == nil || heading! == .upstream) {
+                if (direction == nil || direction! == .forward) {
                     for edge in node.inEdges {
                         frontier.insert(edge.source.id)
                     }
                 }
-                if (heading == nil || heading! == .downstream) {
+                if (direction == nil || direction! == .backward) {
                     for edge in node.outEdges {
                         frontier.insert(edge.target.id)
                     }
@@ -485,7 +486,7 @@ extension Graph {
         return reached
     }
     
-    public func components(_ heading: Heading? = nil) -> [SubGraphType] {
+    public func components(_ direction: Direction? = nil) -> [SubGraphType] {
         var subgraphs = [SubGraphType]()
 
         var visited = Set<NodeID>()
@@ -494,7 +495,7 @@ extension Graph {
                 continue
             }
             
-            let reachable: Set<NodeID> = reachableFrom(nodeID: node.id, heading)
+            let reachable: Set<NodeID> = reachableFrom(nodeID: node.id, direction)
             visited.formUnion(reachable)
             subgraphs.append(subgraph(reachable))
         }

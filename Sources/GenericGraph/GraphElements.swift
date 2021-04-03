@@ -31,20 +31,19 @@ public protocol Node: AnyObject where
     
     var value: ValueType? { get set }
         
-    var inEdges: InEdgeCollectionType { get }
-    
     var outEdges: OutEdgeCollectionType { get }
     
+    var inEdges: InEdgeCollectionType { get }
 }
 
 extension Node {
     
-    var inDegree: Int {
-        return inEdges.count
-    }
-    
     var outDegree: Int {
         return outEdges.count
+    }
+
+    var inDegree: Int {
+        return inEdges.count
     }
 }
 
