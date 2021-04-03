@@ -16,7 +16,7 @@ import Foundation
 ///
 ///
 ///
-public enum Heading: CaseIterable {
+public enum Heading: String, CaseIterable {
     case downstream
     case upstream
 
