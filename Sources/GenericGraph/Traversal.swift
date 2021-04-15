@@ -411,7 +411,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
     public mutating func next() -> Path<NodeType.EdgeType>? {
         if let path = pop() {
             if path.length < radius {
-                let steps = StepCollection<NodeType.EdgeType>(path.origin, direction)
+                let steps = StepCollection<NodeType.EdgeType>(path.destination, direction)
                 for step in steps {
                     if !_visited.contains(step.destination.id) {
                         try! push(path.append(step))
