@@ -9,7 +9,7 @@ import Foundation
 
 public protocol EmbeddableNodeValue {
 
-    var location: SIMD3<Float> { get set }
+    var location: SIMD3<Float> { get }
 }
 
 extension Graph where
