@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol EmbeddableNodeValue {
+public protocol EmbeddableNodeValue {
 
     var location: SIMD3<Float> { get set }
 }
@@ -15,7 +15,7 @@ protocol EmbeddableNodeValue {
 extension Graph where
     NodeType.ValueType: EmbeddableNodeValue {
 
-    func makeBoundingBox() -> BoundingBox {
+    public func makeBoundingBox() -> BoundingBox {
         var bbox: BoundingBox? = nil
         for node in nodes {
             if let p = node.value?.location {

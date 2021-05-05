@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct BoundingBox {
+public struct BoundingBox {
 
     var xMin: Float
     var yMin: Float
@@ -18,15 +18,15 @@ struct BoundingBox {
     var yMax: Float
     var zMax: Float
 
-    var min: SIMD3<Float> {
+    public var min: SIMD3<Float> {
         return SIMD3<Float>(xMin, yMin, zMin)
     }
     
-    var max: SIMD3<Float> {
+    public var max: SIMD3<Float> {
         return SIMD3<Float>(xMax, yMax, zMax)
     }
     
-    init(x0: Float, y0: Float, z0: Float, x1: Float, y1: Float, z1: Float) {
+    public init(x0: Float, y0: Float, z0: Float, x1: Float, y1: Float, z1: Float) {
         xMin = Float.minimum(x0, x1)
         yMin = Float.minimum(y0, y1)
         zMin = Float.minimum(z0, z1)
@@ -36,7 +36,7 @@ struct BoundingBox {
         zMax = Float.maximum(z0, z1)
     }
 
-    init(_ point: SIMD3<Float>) {
+    public init(_ point: SIMD3<Float>) {
         xMin = point.x
         yMin = point.y
         zMin = point.z
@@ -46,7 +46,7 @@ struct BoundingBox {
         zMax = point.z
     }
     
-    mutating func cover(_ point: SIMD3<Float>) {
+    public mutating func cover(_ point: SIMD3<Float>) {
         if point.x < xMin {
             xMin = point.x
         }
