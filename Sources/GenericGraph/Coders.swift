@@ -372,13 +372,11 @@ public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decod
     }
     
     public func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> N? {
-        var nodeValue = try container.decodeIfPresent(N.self, forKey: .value)
-        return nodeValue
+        return try container.decodeIfPresent(N.self, forKey: .value)
     }
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> E? {
-        var edgeValue = try container.decodeIfPresent(E.self, forKey: .value)
-        return edgeValue
+        return try container.decodeIfPresent(E.self, forKey: .value)
     }
     
     public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
