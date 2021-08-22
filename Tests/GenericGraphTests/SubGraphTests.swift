@@ -10,61 +10,85 @@ import XCTest
 
 final class SubGraphTests: XCTestCase {
     
-    private var nodeNumber: Int = 1
-    
-    private var edgeNumber: Int = 1
-    
-    func nodeValueFactory() -> String {
-        let value = "node\(nodeNumber)"
-        nodeNumber += 1
-        return value
-    }
-    
-    func edgeValueFactory() -> String {
-        let value = "edge\(edgeNumber)"
-        edgeNumber += 1
-        return value
-    }
-    
-    func test0() throws {
-        
-        let baseNodeCount = 4
-        let baseGraph = try BaseGraphFactory.completeGraph(baseNodeCount, nodeValueFactory, edgeValueFactory, allowSelfLoops: false)
-        let subgraph = SubGraph<String, String>(baseGraph)
-        
-        var baseNodeIter = baseGraph.nodes.makeIterator()
-        for _ in 0..<(baseNodeCount/2) {
-            if let subNodeId = baseNodeIter.next()?.id {
-                try subgraph.addNode(id: subNodeId)
-            }
-            
-        }
+    func test_subgraphCreation() throws {
 
-        let printer = GraphPrinter()
-        printer.printString("subgraph", 0)
-        printer.printGraph(subgraph, 1)
-    }
-    
-    func test1() throws {
-        let printer = GraphPrinter()
-        let baseGraph = try BaseGraphFactory.makeBaseGraph0()
-        
+        let graph = BaseGraph<String, String>()
+        let node0 = graph.addNode("node0")
+        let node1 = graph.addNode("node1")
+        let node2 = graph.addNode("node2")
+        try graph.addEdge(node0.id, node1.id, "edge01")
+        try graph.addEdge(node0.id, node2.id, "edge02")
+        try graph.addEdge(node1.id, node0.id, "edge10")
+        try graph.addEdge(node1.id, node2.id, "edge12")
+        try graph.addEdge(node2.id, node0.id, "edge20")
+        try graph.addEdge(node2.id, node1.id, "edge21")
+
         var nodeIDs = Set<NodeID>()
-        var lastNodeID: NodeID = 0
-        for baseNode in baseGraph.nodes {
-            nodeIDs.insert(baseNode.id)
-            lastNodeID = baseNode.id
-        }
-        nodeIDs.remove(lastNodeID)
+        nodeIDs.insert(node0.id)
+        nodeIDs.insert(node1.id)
+        let subgraph = graph.subgraph(nodeIDs)
 
-        let graph = baseGraph.subgraph(nodeIDs)
-        printer.printString("subgraph", 0)
-        printer.printGraph(graph, 1)
+        XCTAssertEqual(2, subgraph.nodes.count)
+        XCTAssertEqual(2, subgraph.edges.count)
     }
-        
+
+    func test_subgraphNodeDeletion() throws {
+
+        let graph = BaseGraph<String, String>()
+        let node0 = graph.addNode("node0")
+        let node1 = graph.addNode("node1")
+        let node2 = graph.addNode("node2")
+        try graph.addEdge(node0.id, node1.id, "edge01")
+        try graph.addEdge(node0.id, node2.id, "edge02")
+        try graph.addEdge(node1.id, node0.id, "edge10")
+        try graph.addEdge(node1.id, node2.id, "edge12")
+        try graph.addEdge(node2.id, node0.id, "edge20")
+        try graph.addEdge(node2.id, node1.id, "edge21")
+
+        var nodeIDs = Set<NodeID>()
+        nodeIDs.insert(node0.id)
+        nodeIDs.insert(node1.id)
+        nodeIDs.insert(node2.id)
+        let subgraph = graph.subgraph(nodeIDs)
+
+        XCTAssertEqual(graph.nodes.count, subgraph.nodes.count)
+        XCTAssertEqual(graph.edges.count, subgraph.edges.count)
+
+        subgraph.removeNode(id: node2.id)
+
+        XCTAssertEqual(3, graph.nodes.count)
+        XCTAssertEqual(6, graph.edges.count)
+        XCTAssertEqual(2, subgraph.edges.count)
+        XCTAssertEqual(2, subgraph.edges.count)
+    }
+
+    func test_subgraphInheritsBaseEdgeDeletion() throws {
+
+        let graph = BaseGraph<String, String>()
+        let node0 = graph.addNode("node0")
+        let node1 = graph.addNode("node1")
+        let node2 = graph.addNode("node2")
+        let edge01 = try graph.addEdge(node0.id, node1.id, "edge01")
+        try graph.addEdge(node0.id, node2.id, "edge02")
+        try graph.addEdge(node1.id, node0.id, "edge10")
+        try graph.addEdge(node1.id, node2.id, "edge12")
+        try graph.addEdge(node2.id, node0.id, "edge20")
+        try graph.addEdge(node2.id, node1.id, "edge21")
+
+        var nodeIDs = Set<NodeID>()
+        nodeIDs.insert(node0.id)
+        nodeIDs.insert(node1.id)
+        nodeIDs.insert(node2.id)
+        let subgraph = graph.subgraph(nodeIDs)
+
+        graph.removeEdge(edge01.id)
+
+        XCTAssertEqual(5, subgraph.edges.count)
+    }
+
 
     static var allTests = [
-        ("test0", test0),
-        ("test1", test1)
+        ("test_subgraphCreation", test_subgraphCreation),
+        ("test_subgraphNodeDeletion", test_subgraphNodeDeletion)
     ]
 }

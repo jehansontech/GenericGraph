@@ -22,9 +22,7 @@ fileprivate class Foo: CustomStringConvertible {
 }
 
 final class CoderTests: XCTestCase {
-    
-    let printer = GraphPrinter()
-    
+
     func test_encodeWithNoValues() throws {
         let graph = BaseGraph<Foo, Foo>()
         let n0 = graph.addNode(Foo("n0"))
@@ -37,7 +35,8 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
     }
 
     func test_encodeWithNodeValues() throws {
@@ -52,7 +51,8 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
     }
     
     func test_encodeWithEdgeValues() throws {
@@ -67,7 +67,8 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
     }
     
     func test_encodeWithBothValues() throws {
@@ -82,7 +83,8 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
     }
 
     func test_decodeWithNoValues() throws {
@@ -115,7 +117,6 @@ final class CoderTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
         let graph = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, Foo.self), from: data).graph
-        printGraph("graph", graph)
 
         XCTAssertEqual(graph.nodes.count, 3)
         for node in graph.nodes {
@@ -128,7 +129,6 @@ final class CoderTests: XCTestCase {
         for edge in graph.edges {
             XCTAssertNil(edge.value)
         }
-
     }
     
     func test_decodeWithNodeValues() throws {
@@ -164,7 +164,6 @@ final class CoderTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
         let graph = try decoder.decode(BaseGraph.decodingDelegateType(String.self, Foo.self), from: data).graph
-        printGraph("graph", graph)
 
         XCTAssertEqual(graph.nodes.count, 3)
         for node in graph.nodes {
@@ -209,7 +208,6 @@ final class CoderTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
         let graph = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, String.self), from: data).graph
-        printGraph("graph", graph)
 
         XCTAssertEqual(graph.nodes.count, 3)
         for node in graph.nodes {
@@ -257,7 +255,6 @@ final class CoderTests: XCTestCase {
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
         let graph = try decoder.decode(BaseGraph.decodingDelegateType(String.self, String.self), from: data).graph
-        printGraph("graph", graph)
 
         XCTAssertEqual(graph.nodes.count, 3)
         for node in graph.nodes {
@@ -284,11 +281,11 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
 
         let decoder = JSONDecoder()
         let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, Foo.self), from: data).graph
-        printGraph("graph2", graph2)
 
         XCTAssertEqual(graph2.nodes.count, 3)
         for node in graph2.nodes {
@@ -315,11 +312,11 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
 
         let decoder = JSONDecoder()
         let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(String.self, Foo.self), from: data).graph
-        printGraph("graph2", graph2)
 
         XCTAssertEqual(graph2.nodes.count, 3)
         for node in graph2.nodes {
@@ -346,11 +343,11 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
 
         let decoder = JSONDecoder()
         let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(Foo.self, String.self), from: data).graph
-        printGraph("graph2", graph2)
 
         XCTAssertEqual(graph2.nodes.count, 3)
         for node in graph2.nodes {
@@ -377,11 +374,11 @@ final class CoderTests: XCTestCase {
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
-        printString("json", json)
+
+        // TODO verify json
 
         let decoder = JSONDecoder()
         let graph2 = try decoder.decode(BaseGraph.decodingDelegateType(String.self, String.self), from: data).graph
-        printGraph("graph2", graph2)
 
         XCTAssertEqual(graph2.nodes.count, 3)
         for node in graph2.nodes {
@@ -396,18 +393,6 @@ final class CoderTests: XCTestCase {
         }
     }
 
-
-    private func printString(_ label: String, _ s: String) {
-        printer.printString("---- \(label) ----", 0)
-        printer.printString(s, 1)
-    }
-    
-    private func printGraph<GraphType: Graph>(_ label: String, _ graph: GraphType) {
-        printer.printString("---- \(label) ----", 0)
-        printer.printGraph(graph, 1)
-        
-    }
-    
     static var allTests = [
         ("test_encodeWithNoValues", test_encodeWithNoValues),
         ("test_encodeWithNodeValues", test_encodeWithNodeValues),
@@ -422,5 +407,4 @@ final class CoderTests: XCTestCase {
         ("test_roundTripWithEdgeValues", test_roundTripWithEdgeValues),
         ("test_roundTripWithBothValues", test_roundTripWithBothValues)
     ]
-
 }

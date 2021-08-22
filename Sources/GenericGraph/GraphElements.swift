@@ -138,33 +138,3 @@ public protocol Graph: AnyObject where
     
     func subgraph(_ nodeIDs: Set<NodeID>) -> SubGraphType
 }
-
-
-///
-///
-///
-extension Graph {
-    
-    /// returns IDs of nodes with inDegree 0
-    public func sourceNodes() -> Set<NodeID> {
-        var sources = Set<NodeID>()
-        for node in nodes {
-            if node.inDegree == 0 {
-                sources.insert(node.id)
-            }
-        }
-        return sources
-    }
-    
-    /// returns IDs of nodes with outDegree 0
-    public func sinkNodes() -> Set<NodeID> {
-        var sinks = Set<NodeID>()
-        for node in nodes {
-            if node.outDegree == 0 {
-                sinks.insert(node.id)
-            }
-        }
-        return sinks
-    }
-}
-

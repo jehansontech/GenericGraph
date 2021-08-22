@@ -2,9 +2,6 @@
 //
 //  Traversal.swift
 //
-//
-//  Created by Jim Hanson on 3/8/21.
-//
 
 import Foundation
 
@@ -463,6 +460,45 @@ extension Node {
 ///
 extension Graph {
         
+    /// returns IDs of nodes with inDegree 0
+    public func sourceNodes() -> Set<NodeID> {
+        var sources = Set<NodeID>()
+        for node in nodes {
+            if node.inDegree == 0 {
+                sources.insert(node.id)
+            }
+        }
+        return sources
+    }
+
+    /// returns IDs of nodes with outDegree 0
+    public func sinkNodes() -> Set<NodeID> {
+        var sinks = Set<NodeID>()
+        for node in nodes {
+            if node.outDegree == 0 {
+                sinks.insert(node.id)
+            }
+        }
+        return sinks
+    }
+
+    public func components(_ direction: Direction? = nil) -> [SubGraphType] {
+        var subgraphs = [SubGraphType]()
+
+        var visited = Set<NodeID>()
+        for node in self.nodes {
+            if visited.contains(node.id) {
+                continue
+            }
+            
+            let reachable: Set<NodeID> = reachableFrom(nodeID: node.id, direction)
+            visited.formUnion(reachable)
+            subgraphs.append(subgraph(reachable))
+        }
+
+        return subgraphs
+    }
+
     public func reachableFrom(nodeID: NodeID, _ direction: Direction? = nil) -> Set<NodeID> {
         var reached = Set<NodeID>()
         var frontier = Set<NodeID>()
@@ -484,22 +520,5 @@ extension Graph {
             }
         }
         return reached
-    }
-    
-    public func components(_ direction: Direction? = nil) -> [SubGraphType] {
-        var subgraphs = [SubGraphType]()
-
-        var visited = Set<NodeID>()
-        for node in self.nodes {
-            if visited.contains(node.id) {
-                continue
-            }
-            
-            let reachable: Set<NodeID> = reachableFrom(nodeID: node.id, direction)
-            visited.formUnion(reachable)
-            subgraphs.append(subgraph(reachable))
-        }
-
-        return subgraphs
     }
 }
