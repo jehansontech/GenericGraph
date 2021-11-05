@@ -72,6 +72,10 @@ public class Step<EdgeType: Edge> {
         self._edge = edge
         self.direction = direction
     }
+
+    public func reverse() -> Step<EdgeType> {
+        return Step(self._edge, Direction.reverse(self.direction))
+    }
 }
 
 
