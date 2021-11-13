@@ -204,7 +204,9 @@ public protocol DecodingDelegate: Decodable {
     var graph: BaseGraph<NodeValueType, EdgeValueType> { get }
     
     mutating func buildGraph(from decoder: Decoder) throws
-    
+
+    mutating func buildGraph(_ graphContainer: KeyedDecodingContainer<GraphCodingKeys>) throws
+
     func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> NodeValueType?
     
     func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>) throws -> EdgeValueType?
@@ -221,7 +223,10 @@ public protocol DecodingDelegate: Decodable {
 extension DecodingDelegate {
     
     public mutating func buildGraph(from decoder: Decoder) throws {
-        let graphContainer = try decoder.container(keyedBy: GraphCodingKeys.self)
+        try buildGraph(try decoder.container(keyedBy: GraphCodingKeys.self))
+    }
+
+    public mutating func buildGraph(_ graphContainer: KeyedDecodingContainer<GraphCodingKeys>) throws {
         var nodesContainer = try graphContainer.nestedUnkeyedContainer(forKey: .nodes)
         while !nodesContainer.isAtEnd {
             var nodeContainer = try nodesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
