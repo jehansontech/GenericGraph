@@ -10,13 +10,13 @@ import Foundation
 
 public struct BoundingBox {
 
-    var xMin: Float
-    var yMin: Float
-    var zMin: Float
+    public var xMin: Float
+    public var yMin: Float
+    public var zMin: Float
 
-    var xMax: Float
-    var yMax: Float
-    var zMax: Float
+    public var xMax: Float
+    public var yMax: Float
+    public var zMax: Float
 
     public var min: SIMD3<Float> {
         return SIMD3<Float>(xMin, yMin, zMin)
