@@ -197,7 +197,7 @@ extension Graph where NodeType.ValueType: Encodable, EdgeType.ValueType: Encodab
 ///
 ///
 ///
-public protocol DecodingDelegate: Decodable {
+public protocol GraphDecodingDelegate: Decodable {
     associatedtype NodeValueType
     associatedtype EdgeValueType
     typealias NodeType = BaseGraphNode<NodeValueType, EdgeValueType>
@@ -224,7 +224,7 @@ public protocol DecodingDelegate: Decodable {
 ///
 ///
 ///
-extension DecodingDelegate {
+extension GraphDecodingDelegate {
     
     public mutating func buildGraph(from decoder: Decoder) throws {
         try buildGraph(try decoder.container(keyedBy: GraphCodingKeys.self))
@@ -267,7 +267,7 @@ extension DecodingDelegate {
 ///
 ///
 ///
-public struct DecodingDelegate_NoValues<N, E>: DecodingDelegate {
+public struct GraphDecoding_NoValues<N, E>: GraphDecodingDelegate {
     public typealias NodeValueType = N
     public typealias EdgeValueType = E
     
@@ -300,7 +300,7 @@ public struct DecodingDelegate_NoValues<N, E>: DecodingDelegate {
 ///
 ///
 ///
-public struct DecodingDelegate_NodeValues<N, E>: DecodingDelegate where N: Decodable {
+public struct GraphDecoding_NodeValues<N, E>: GraphDecodingDelegate where N: Decodable {
     public typealias NodeValueType = N
     public typealias EdgeValueType = E
     
@@ -333,7 +333,7 @@ public struct DecodingDelegate_NodeValues<N, E>: DecodingDelegate where N: Decod
 ///
 ///
 ///
-public struct DecodingDelegate_EdgeValues<N, E>: DecodingDelegate where E: Decodable {
+public struct GraphDecoding_EdgeValues<N, E>: GraphDecodingDelegate where E: Decodable {
     public typealias NodeValueType = N
     public typealias EdgeValueType = E
     
@@ -366,7 +366,7 @@ public struct DecodingDelegate_EdgeValues<N, E>: DecodingDelegate where E: Decod
 ///
 ///
 ///
-public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decodable, E: Decodable {
+public struct GraphDecoding_AllValues<N, E>: GraphDecodingDelegate where N: Decodable, E: Decodable {
     public typealias NodeValueType = N
     public typealias EdgeValueType = E
     
@@ -403,31 +403,31 @@ public struct DecodingDelegate_BothValues<N, E>: DecodingDelegate where N: Decod
 extension BaseGraph {
 
 
-    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_NoValues<N, E>.Type {
-        return DecodingDelegate_NoValues<N, E>.self
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> GraphDecoding_NoValues<N, E>.Type {
+        return GraphDecoding_NoValues<N, E>.self
     }
 }
 
 
 extension BaseGraph where N: Decodable {
     
-    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_NodeValues<N, E>.Type {
-        return DecodingDelegate_NodeValues<N, E>.self
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> GraphDecoding_NodeValues<N, E>.Type {
+        return GraphDecoding_NodeValues<N, E>.self
     }
 }
 
 
 extension BaseGraph where E: Decodable {
     
-    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_EdgeValues<N, E>.Type {
-        return DecodingDelegate_EdgeValues<N, E>.self
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> GraphDecoding_EdgeValues<N, E>.Type {
+        return GraphDecoding_EdgeValues<N, E>.self
     }
 }
 
 
 extension BaseGraph where N: Decodable, E: Decodable {
     
-    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> DecodingDelegate_BothValues<N, E>.Type {
-        return DecodingDelegate_BothValues<N, E>.self
+    public class func decodingDelegateType(_ nType: N.Type, _ eType: E.Type) -> GraphDecoding_AllValues<N, E>.Type {
+        return GraphDecoding_AllValues<N, E>.self
     }
 }
