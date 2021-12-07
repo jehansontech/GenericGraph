@@ -25,7 +25,19 @@ public struct BoundingBox {
     public var max: SIMD3<Float> {
         return SIMD3<Float>(xMax, yMax, zMax)
     }
-    
+
+    public var xBounds: ClosedRange<Float> {
+        return xMin...xMax
+    }
+
+    public var yBounds: ClosedRange<Float> {
+        return yMin...yMax
+    }
+
+    public var zBounds: ClosedRange<Float> {
+        return zMin...zMax
+    }
+
     public init(x0: Float, y0: Float, z0: Float, x1: Float, y1: Float, z1: Float) {
         xMin = Float.minimum(x0, x1)
         yMin = Float.minimum(y0, y1)
