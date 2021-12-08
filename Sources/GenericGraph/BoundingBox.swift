@@ -18,12 +18,28 @@ public struct BoundingBox {
     public var yMax: Float
     public var zMax: Float
 
+    public var xCenter: Float {
+        (xMin + xMax) / 2
+    }
+
+    public var yCenter: Float {
+        (yMin + yMax) / 2
+    }
+
+    public var zCenter: Float {
+        (zMin + zMax) / 2
+    }
+
     public var min: SIMD3<Float> {
         return SIMD3<Float>(xMin, yMin, zMin)
     }
     
     public var max: SIMD3<Float> {
         return SIMD3<Float>(xMax, yMax, zMax)
+    }
+
+    public var center: SIMD3<Float> {
+        return SIMD3<Float>(xCenter, yCenter, zCenter)
     }
 
     public var xBounds: ClosedRange<Float> {
