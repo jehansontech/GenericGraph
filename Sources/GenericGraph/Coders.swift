@@ -210,12 +210,12 @@ public protocol GraphDecodingDelegate: Decodable {
     mutating func buildGraph(_ graphContainer: KeyedDecodingContainer<GraphCodingKeys>) throws
 
     /// node is the node into which the decoded value will be passed
-    func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ node: NodeType) throws -> NodeValueType?
+    mutating func decodeNodeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ node: NodeType) throws -> NodeValueType?
 
     /// edge is the edge into which the decoded value will be passed
-    func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> EdgeValueType?
+    mutating func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> EdgeValueType?
     
-    func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID?
+    mutating func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID?
         
     mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID)
 }
