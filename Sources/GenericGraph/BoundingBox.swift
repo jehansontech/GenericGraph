@@ -1,9 +1,8 @@
 //
 //  BoundingBox.swift
-//  ArcWorld iOS
+//  GenericGraph
 //
 //  Created by James Hanson on 9/29/20.
-//  Copyright © 2020 J.E. Hanson Technologies LLC. All rights reserved.
 //
 
 import Foundation

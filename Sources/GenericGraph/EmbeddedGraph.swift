@@ -1,19 +1,18 @@
 //
-//  Embedding.swift
-//  
+//  EmbeddedGraph.swift
+//  GenericGraph
 //
 //  Created by Jim Hanson on 5/5/21.
 //
 
 import Foundation
 
-public protocol EmbeddableNodeValue {
+public protocol EmbeddedNodeValue {
 
     var location: SIMD3<Float> { get }
 }
 
-extension Graph where
-    NodeType.ValueType: EmbeddableNodeValue {
+extension Graph where NodeType.ValueType: EmbeddedNodeValue {
 
     public func makeBoundingBox() -> BoundingBox {
         var bbox: BoundingBox? = nil

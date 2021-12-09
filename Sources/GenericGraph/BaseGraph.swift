@@ -1,6 +1,6 @@
 //
 //  BaseGraph.swift
-//  
+//  GenericGraph
 //
 //  Created by Jim Hanson on 3/8/21.
 //

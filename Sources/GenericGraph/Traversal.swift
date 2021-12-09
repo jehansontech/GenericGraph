@@ -1,7 +1,6 @@
-
 //
 //  Traversal.swift
-//
+//  GenericGraph
 
 import Foundation
 

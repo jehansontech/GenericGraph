@@ -1,6 +1,6 @@
 //
-//  NewSubGraph.swift
-//  
+//  SubGraph.swift
+//  GenericGraph
 //
 //  Created by Jim Hanson on 3/8/21.
 //
