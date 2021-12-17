@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Wacoma
 
 public struct BoundingBox {
 
