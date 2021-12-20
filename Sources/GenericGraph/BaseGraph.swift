@@ -215,7 +215,7 @@ public class BaseGraph<N, E>: Graph {
             
     public init() {}
         
-    public func subgraph(_ nodeIDs: Set<NodeID>) -> SubGraph<N, E> {
+    public func subgraph<S: Sequence>(_ nodeIDs: S) -> SubGraph<N, E> where S.Element == NodeID {
         return SubGraph<N, E>(self, nodeIDs)
     }
     
@@ -238,7 +238,12 @@ public class BaseGraph<N, E>: Graph {
             }
         }
     }
-    
+
+    public func removeNodes<S: Sequence>(_ ids: S) where S.Element == NodeID {
+        ids.forEach({ removeNode($0) })
+    }
+
+
     @discardableResult public func addEdge(_ from: NodeID, _ to: NodeID, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
             let source = _nodes[from]
@@ -261,7 +266,11 @@ public class BaseGraph<N, E>: Graph {
             edge._target._inEdges._dict.removeValue(forKey: id)
         }
     }
-    
+
+    public func removeEdges<S: Sequence>(_ ids: S) where S.Element == EdgeID {
+        ids.forEach({ removeEdge($0) })
+    }
+
     private func addAndInstallEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E?) -> BaseGraphEdge<N, E> {
         let id = _nextEdgeID
         _nextEdgeID += 1
@@ -273,3 +282,4 @@ public class BaseGraph<N, E>: Graph {
         return newEdge
     }
 }
+

@@ -481,9 +481,12 @@ public class SubGraph<N, E>: Graph {
     
     lazy internal var _edges = SubGraphEdgeCollection<N,E>(self)
     
-    public init(_ baseGraph: BaseGraph<N, E>, _ nodeIDs: Set<NodeID>) {
+    public init<S: Sequence>(_ baseGraph: BaseGraph<N, E>, _ nodeIDs: S) where S.Element == NodeID {
         self.baseGraph = baseGraph
-        self._nodeIDs = nodeIDs.filter { baseGraph._nodes.contains($0) }
+
+        let validNodeIDs = Set<NodeID>(baseGraph._nodes.map({$0.id}))
+        let givenNodeIDs = Set<NodeID>(nodeIDs)
+        self._nodeIDs = validNodeIDs.intersection(givenNodeIDs)
     }
 
     public convenience init(_ baseGraph: BaseGraph<N, E>) {
