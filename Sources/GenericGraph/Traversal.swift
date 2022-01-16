@@ -30,7 +30,7 @@ public enum Direction: String, CaseIterable, Codable {
 ///
 ///
 ///
-public class Step<EdgeType: Edge> {
+public class Step<EdgeType: Edge>: Hashable {
     
     public var edgeID: EdgeID {
         return _edge.id
@@ -74,6 +74,15 @@ public class Step<EdgeType: Edge> {
 
     public func reverse() -> Step<EdgeType> {
         return Step(self._edge, Direction.reverse(self.direction))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(edgeID)
+        hasher.combine(direction)
+    }
+
+    public static func ==<EdgeType: Edge>(lhs: Step<EdgeType>, rhs: Step<EdgeType>) -> Bool {
+        return lhs.edgeID == rhs.edgeID && lhs.direction == rhs.direction
     }
 }
 

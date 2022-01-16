@@ -18,7 +18,7 @@ public typealias NodeID = Int
 ///
 ///
 ///
-public protocol Node: AnyObject where
+public protocol Node: AnyObject, Hashable where
     InEdgeCollectionType.EdgeType == EdgeType,
     OutEdgeCollectionType.EdgeType == EdgeType {
     
@@ -38,12 +38,25 @@ public protocol Node: AnyObject where
 
 extension Node {
     
-    var outDegree: Int {
+    public var outDegree: Int {
         return outEdges.count
     }
 
-    var inDegree: Int {
+    public var inDegree: Int {
         return inEdges.count
+    }
+
+    public var degree: Int {
+        return inEdges.count + outEdges.count
+    }
+
+    /// equality is testable only within a given graph
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
@@ -75,7 +88,7 @@ public typealias EdgeID = Int
 ///
 ///
 ///
-public protocol Edge: AnyObject {
+public protocol Edge: AnyObject, Hashable {
     associatedtype ValueType
     associatedtype NodeType: Node
     
@@ -86,6 +99,22 @@ public protocol Edge: AnyObject {
     var source: NodeType { get }
     
     var target: NodeType { get }
+}
+
+extension Edge {
+
+    /// equality is testable only within a given graph
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    public var isSelfEdge: Bool {
+        return source == target
+    }
 }
 
 ///
