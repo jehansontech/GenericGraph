@@ -139,6 +139,7 @@ public protocol EdgeCollection: Sequence where Element == EdgeType {
 
 
 public enum GraphError: Error {
+    case nodeExists(id: NodeID)
     case noSuchNode(id: NodeID)
     case noSuchEdge(id: EdgeID)
 }

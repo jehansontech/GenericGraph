@@ -218,7 +218,20 @@ public class BaseGraph<N, E>: Graph {
     public func subgraph<S: Sequence>(_ nodeIDs: S) -> SubGraph<N, E> where S.Element == NodeID {
         return SubGraph<N, E>(self, nodeIDs)
     }
-    
+
+    // TODO: determine whether this is safe
+    //    @discardableResult public func addNode(_ id: NodeID, _ value: N? = nil) throws -> BaseGraphNode<N, E> {
+    //        if _nodes._dict[id] != nil {
+    //            throw GraphError.nodeExists(id: id)
+    //        }
+    //
+    //        _nextNodeID = max(id, _nextNodeID) + 1
+    //
+    //        let newNode = BaseGraphNode<N, E>(id, value)
+    //        _nodes._dict[id] = newNode
+    //        return newNode
+    //    }
+
     @discardableResult public func addNode(_ value: N? = nil) -> BaseGraphNode<N, E> {
         let id = _nextNodeID
         _nextNodeID += 1
