@@ -284,6 +284,11 @@ public class BaseGraph<N, E>: Graph {
         ids.forEach({ removeEdge($0) })
     }
 
+    public func clearAll() {
+        _edges._dict.removeAll()
+        _nodes._dict.removeAll()
+    }
+
     private func addAndInstallEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E?) -> BaseGraphEdge<N, E> {
         let id = _nextEdgeID
         _nextEdgeID += 1
