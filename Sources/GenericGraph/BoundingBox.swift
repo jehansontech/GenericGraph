@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import simd
 
 public struct BoundingBox: Sendable, Codable {
 
@@ -35,6 +36,19 @@ public struct BoundingBox: Sendable, Codable {
         xMax = point.x
         yMax = point.y
         zMax = point.z
+    }
+
+}
+
+extension BoundingBox {
+
+    public static func unitCube() -> BoundingBox {
+        return BoundingBox(x0: 0, y0: 0, z0: 0, x1: 1, y1: 1, z1: 1)
+    }
+
+    public static func centeredCube(_ size: Float = 1) -> BoundingBox {
+        let w = (size > 0) ? size/2 : 0.5
+        return BoundingBox(x0: -w, y0: -w, z0: -w, x1: w, y1: w, z1: w)
     }
 }
 
@@ -92,6 +106,34 @@ extension BoundingBox {
         return zMin...zMax
     }
 
+    public var corners: [SIMD3<Float>] {
+        [
+            SIMD3<Float>(xMin, yMin, zMin),
+            SIMD3<Float>(xMin, yMin, zMax),
+            SIMD3<Float>(xMin, yMax, zMin),
+            SIMD3<Float>(xMin, yMax, zMax),
+            SIMD3<Float>(xMax, yMin, zMin),
+            SIMD3<Float>(xMax, yMin, zMax),
+            SIMD3<Float>(xMax, yMax, zMin),
+            SIMD3<Float>(xMax, yMax, zMax)
+        ]
+    }
+
+    public var radius: Float {
+        var rx: Float = 0
+        let cx = self.center
+        for corner in corners {
+            let d = simd_distance(corner, cx)
+            if d > rx {
+                rx = d
+            }
+        }
+        return rx
+    }
+}
+
+extension BoundingBox {
+
     public mutating func cover(_ point: SIMD3<Float>) {
         if point.x < xMin {
             xMin = point.x
@@ -112,6 +154,11 @@ extension BoundingBox {
         if point.z > zMax {
             zMax = point.z
         }
+    }
+
+    public mutating func cover(_ bbox: BoundingBox) {
+        self.cover(bbox.min)
+        self.cover(bbox.max)
     }
 
 }
