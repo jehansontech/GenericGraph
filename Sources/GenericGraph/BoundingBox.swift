@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct BoundingBox {
+public struct BoundingBox: Sendable, Codable {
 
     public var xMin: Float
     public var yMin: Float
