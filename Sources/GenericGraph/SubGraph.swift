@@ -465,6 +465,8 @@ public class SubGraph<N, E>: Graph {
     public typealias EdgeCollectionType = SubGraphEdgeCollection<N, E>
     public typealias SubGraphType = SubGraph<N, E>
 
+    public lazy var id = GraphID(self)
+
     public var nodes: SubGraphNodeCollection<N, E> {
         return _nodes
     }

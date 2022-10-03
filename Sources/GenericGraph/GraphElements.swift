@@ -138,6 +138,8 @@ public protocol EdgeCollection: Sequence where Element == EdgeType {
 // ====================================================
 
 
+public typealias GraphID = ObjectIdentifier
+
 public enum GraphError: Error {
     case nodeExists(id: NodeID)
     case noSuchNode(id: NodeID)
@@ -148,20 +150,23 @@ public enum GraphError: Error {
 ///
 ///
 ///
-public protocol Graph: AnyObject where
-    EdgeType.NodeType == NodeType,
-    NodeType.EdgeType == EdgeType,
-    NodeCollectionType.NodeType == NodeType,
-    EdgeCollectionType.EdgeType == EdgeType,
-    SubGraphType.NodeType.ValueType == NodeType.ValueType,
-    SubGraphType.EdgeType.ValueType == EdgeType.ValueType {
+public protocol Graph: AnyObject
+where EdgeType.NodeType == NodeType,
+      NodeType.EdgeType == EdgeType,
+      NodeCollectionType.NodeType == NodeType,
+      EdgeCollectionType.EdgeType == EdgeType,
+      SubGraphType.NodeType.ValueType == NodeType.ValueType,
+      SubGraphType.EdgeType.ValueType == EdgeType.ValueType
+{
     
     associatedtype NodeType
     associatedtype EdgeType
     associatedtype NodeCollectionType: NodeCollection
     associatedtype EdgeCollectionType: EdgeCollection
     associatedtype SubGraphType: Graph
-    
+
+    var id: GraphID { get }
+
     var nodes: NodeCollectionType { get }
 
     var edges: EdgeCollectionType { get }

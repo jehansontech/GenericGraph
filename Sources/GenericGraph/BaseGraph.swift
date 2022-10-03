@@ -197,6 +197,8 @@ public class BaseGraph<N, E>: Graph {
     public typealias EdgeCollectionType = BaseGraphEdgeCollection<N, E>
     public typealias SubGraphType = SubGraph<N, E>
 
+    public lazy var id = GraphID(self)
+
     public var nodes: BaseGraphNodeCollection<N, E> {
         return _nodes
     }
