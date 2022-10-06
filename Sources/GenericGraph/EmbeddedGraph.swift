@@ -7,6 +7,7 @@
 
 import Foundation
 import simd
+import Wacoma
 
 public protocol EmbeddedNodeValue {
 
