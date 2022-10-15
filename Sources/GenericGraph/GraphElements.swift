@@ -14,6 +14,9 @@ import Foundation
 
 public typealias NodeID = Int
 
+extension NodeID {
+    public static let noNode: NodeID = -1
+}
 
 ///
 ///
