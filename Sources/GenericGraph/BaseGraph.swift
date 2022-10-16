@@ -258,7 +258,6 @@ public class BaseGraph<N, E>: Graph {
         ids.forEach({ removeNode($0) })
     }
 
-
     @discardableResult public func addEdge(_ from: NodeID, _ to: NodeID, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
             let source = _nodes[from]
