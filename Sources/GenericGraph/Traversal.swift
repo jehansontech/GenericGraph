@@ -12,7 +12,7 @@ import Foundation
 ///
 ///
 ///
-public enum Direction: String, CaseIterable, Codable {
+public enum Direction: String, CaseIterable, Codable, Sendable {
     case forward
     case backward
 
