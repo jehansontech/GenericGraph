@@ -30,7 +30,7 @@ public enum Direction: String, CaseIterable, Codable, Sendable {
 ///
 ///
 ///
-public class Step<EdgeType: Edge>: Hashable {
+public class Step<EdgeType: Edge>: Hashable, Equatable {
     
     public var edgeID: EdgeID {
         return _edge.id
