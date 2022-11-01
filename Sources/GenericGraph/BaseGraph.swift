@@ -271,9 +271,20 @@ public class BaseGraph<N, E>: Graph {
             throw GraphError.noSuchNode(id: to)
         }
         
-        return addAndInstallEdge(source, target, value)
+        return uncheckedAddEdge(source, target, value)
     }
-    
+
+    @discardableResult public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E?) -> BaseGraphEdge<N, E> {
+        let id = _nextEdgeID
+        _nextEdgeID += 1
+
+        let newEdge = BaseGraphEdge<N, E>(id, value, source, target)
+        _edges._dict[id] = newEdge
+        source._outEdges._dict[id] = newEdge
+        target._inEdges._dict[id] = newEdge
+        return newEdge
+    }
+
     public func removeEdge(_ id: EdgeID) {
         if let edge = _edges._dict.removeValue(forKey: id) {
             edge._source._outEdges._dict.removeValue(forKey: id)
@@ -290,15 +301,5 @@ public class BaseGraph<N, E>: Graph {
         _nodes._dict.removeAll()
     }
 
-    private func addAndInstallEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E?) -> BaseGraphEdge<N, E> {
-        let id = _nextEdgeID
-        _nextEdgeID += 1
-        
-        let newEdge = BaseGraphEdge<N, E>(id, value, source, target)
-        _edges._dict[id] = newEdge
-        source._outEdges._dict[id] = newEdge
-        target._inEdges._dict[id] = newEdge
-        return newEdge
-    }
 }
 
