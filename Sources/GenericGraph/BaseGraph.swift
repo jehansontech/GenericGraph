@@ -55,6 +55,10 @@ public struct BaseGraphNodeCollection<N, E>: NodeCollection {
     public typealias NodeType = BaseGraphNode<N, E>
     public typealias Iterator = BaseGraphNodeIterator<N, E>
     
+    public var isEmpty: Bool {
+        return _dict.isEmpty
+    }
+
     public var count: Int {
         return _dict.count
     }
@@ -140,7 +144,11 @@ public class BaseGraphEdge<N, E>: Edge {
 public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
     public typealias EdgeType = BaseGraphEdge<N, E>
     public typealias Iterator = BaseGraphEdgeIterator<N, E>
-    
+
+    public var isEmpty: Bool {
+        return _dict.isEmpty
+    }
+
     public var count: Int {
         return _dict.count
     }

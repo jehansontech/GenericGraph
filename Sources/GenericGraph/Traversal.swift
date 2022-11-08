@@ -456,7 +456,18 @@ extension Node {
     public func steps(_ direction: Direction? = nil) -> StepCollection<EdgeType> {
         return StepCollection<EdgeType>(self as! EdgeType.NodeType, direction)
     }
-    
+
+    public func nearestNeighbors() -> [NodeID] {
+        var nbrs = [NodeID]()
+        self.outEdges.forEach {
+            nbrs.append($0.target.id)
+        }
+        self.inEdges.forEach {
+            nbrs.append($0.source.id)
+        }
+        return nbrs
+    }
+
     public func neighborhood(_ radius: Int, _ direction: Direction? = nil) -> Neighborhood<Self> {
         return Neighborhood<Self>(self, radius, direction)
     }
