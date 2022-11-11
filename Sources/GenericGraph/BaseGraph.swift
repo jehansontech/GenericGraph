@@ -282,7 +282,7 @@ public class BaseGraph<N, E>: Graph {
         return uncheckedAddEdge(source, target, value)
     }
 
-    @discardableResult public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E?) -> BaseGraphEdge<N, E> {
+    @discardableResult public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E? = nil) -> BaseGraphEdge<N, E> {
         let id = _nextEdgeID
         _nextEdgeID += 1
 
