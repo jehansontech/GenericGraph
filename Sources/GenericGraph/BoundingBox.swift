@@ -8,7 +8,7 @@
 //import Foundation
 //import simd
 //
-//public struct BoundingBox: Sendable, Codable {
+//public struct BoundingBox: Codable, Sendable {
 //
 //    public var xMin: Float
 //    public var yMin: Float
