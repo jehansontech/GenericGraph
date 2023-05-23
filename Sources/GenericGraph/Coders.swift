@@ -9,7 +9,7 @@ import Foundation
 
 
 public enum GraphCodingKeys: String, CodingKey {
-    case id
+    case nodeNumber
     case value
     case target
     case nodes
@@ -48,13 +48,13 @@ extension EncodingDelegate {
         
         for node in graph.nodes {
             var nodeContainer = nodesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
-            try nodeContainer.encode(node.id, forKey: .id)
+            try nodeContainer.encode(node.nodeNumber, forKey: .nodeNumber)
             try encodeNodeValue(node.value, &nodeContainer)
             
             var outEdgesContainer = nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
             for edge in node.outEdges {
                 var edgeContainer = outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
-                try edgeContainer.encode(edge.target.id, forKey: .target)
+                try edgeContainer.encode(edge.target.nodeNumber, forKey: .target)
                 try encodeEdgeValue(edge.value, &edgeContainer)
             }
         }
@@ -215,9 +215,9 @@ public protocol GraphDecodingDelegate: Decodable {
     /// edge is the edge into which the decoded value will be passed
     mutating func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> EdgeValueType?
     
-    mutating func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID?
+    mutating func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int?
         
-    mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID)
+    mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int)
 }
 
 
@@ -235,28 +235,28 @@ extension GraphDecodingDelegate {
         while !nodesContainer.isAtEnd {
             var nodeContainer = try nodesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
             
-            let decodedNodeID = try nodeContainer.decode(NodeID.self, forKey: .id)
-            let createdNode = findOrCreateNode(decodedNodeID)
+            let decodedNodeNumber = try nodeContainer.decode(Int.self, forKey: .nodeNumber)
+            let createdNode = findOrCreateNode(decodedNodeNumber)
             createdNode.value = try decodeNodeValue(&nodeContainer, createdNode)
 
             var outEdgesContainer = try nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
             while !outEdgesContainer.isAtEnd {
                 var edgeContainer = try outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
-                let decodedTargetNodeID = try edgeContainer.decode(NodeID.self, forKey: .target)
-                let targetNode = findOrCreateNode(decodedTargetNodeID)
-                let createdEdge = try graph.addEdge(createdNode.id, targetNode.id)
+                let decodedTargetNodeNumber = try edgeContainer.decode(Int.self, forKey: .target)
+                let targetNode = findOrCreateNode(decodedTargetNodeNumber)
+                let createdEdge = try graph.addEdge(createdNode.nodeNumber, targetNode.nodeNumber)
                 createdEdge.value = try decodeEdgeValue(&edgeContainer, createdEdge)
             }
         }
     }
     
-    public mutating func findOrCreateNode(_ decodedNodeID: NodeID) -> BaseGraph<NodeValueType, EdgeValueType>.NodeType {
-        if let createdNodeID = getCreatedNodeID(decodedNodeID) {
-            return graph.nodes[createdNodeID]!
+    public mutating func findOrCreateNode(_ decodedNodeNumber: Int) -> BaseGraph<NodeValueType, EdgeValueType>.NodeType {
+        if let createdNodeNumber = getCreatedNodeNumber(decodedNodeNumber) {
+            return graph.nodes[createdNodeNumber]!
         }
         else {
             let createdNode = graph.addNode()
-            registerCreatedNodeID(decodedNodeID, createdNode.id)
+            registerCreatedNodeNumber(decodedNodeNumber, createdNode.nodeNumber)
             return createdNode
         }
     }
@@ -273,7 +273,7 @@ public struct GraphDecoding_NoValues<N, E>: GraphDecodingDelegate {
     
     public var graph = BaseGraph<N, E>()
 
-    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    private var decodedToCreatedNodeNumbers = [Int: Int]()
     
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
@@ -287,12 +287,12 @@ public struct GraphDecoding_NoValues<N, E>: GraphDecodingDelegate {
         return nil
     }
     
-    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
-        return decodedToCreatedNodeIDs[decodedNodeID]
+    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
+        return decodedToCreatedNodeNumbers[decodedNodeNumber]
     }
         
-    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
-        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
+        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -306,7 +306,7 @@ public struct GraphDecoding_NodeValues<N, E>: GraphDecodingDelegate where N: Dec
     
     public var graph = BaseGraph<N, E>()
     
-    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    private var decodedToCreatedNodeNumbers = [Int: Int]()
     
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
@@ -320,12 +320,12 @@ public struct GraphDecoding_NodeValues<N, E>: GraphDecodingDelegate where N: Dec
         return nil
     }
     
-    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
-        return decodedToCreatedNodeIDs[decodedNodeID]
+    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
+        return decodedToCreatedNodeNumbers[decodedNodeNumber]
     }
         
-    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
-        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
+        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -339,7 +339,7 @@ public struct GraphDecoding_EdgeValues<N, E>: GraphDecodingDelegate where E: Dec
     
     public var graph = BaseGraph<N, E>()
     
-    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    private var decodedToCreatedNodeNumbers = [Int: Int]()
     
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
@@ -353,12 +353,12 @@ public struct GraphDecoding_EdgeValues<N, E>: GraphDecodingDelegate where E: Dec
         return try container.decodeIfPresent(E.self, forKey: .value)
     }
     
-    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
-        return decodedToCreatedNodeIDs[decodedNodeID]
+    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
+        return decodedToCreatedNodeNumbers[decodedNodeNumber]
     }
         
-    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
-        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
+        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -372,7 +372,7 @@ public struct GraphDecoding_AllValues<N, E>: GraphDecodingDelegate where N: Deco
     
     public var graph = BaseGraph<N, E>()
     
-    private var decodedToCreatedNodeIDs = [NodeID: NodeID]()
+    private var decodedToCreatedNodeNumbers = [Int: Int]()
     
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
@@ -386,12 +386,12 @@ public struct GraphDecoding_AllValues<N, E>: GraphDecodingDelegate where N: Deco
         return try container.decodeIfPresent(E.self, forKey: .value)
     }
     
-    public func getCreatedNodeID(_ decodedNodeID: NodeID) -> NodeID? {
-        return decodedToCreatedNodeIDs[decodedNodeID]
+    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
+        return decodedToCreatedNodeNumbers[decodedNodeNumber]
     }
         
-    public mutating func registerCreatedNodeID(_ decodedNodeID: NodeID, _ createdNodeID: NodeID) {
-        decodedToCreatedNodeIDs[decodedNodeID] = createdNodeID
+    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
+        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 

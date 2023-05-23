@@ -21,8 +21,8 @@ public class SubGraphNode<N, E>: Node {
     public typealias InEdgeCollectionType = SubGraphInEdgeCollection<N, E>
     public typealias OutEdgeCollectionType = SubGraphOutEdgeCollection<N, E>
     
-    public var id: NodeID {
-        return _baseNode.id
+    public var nodeNumber: Int {
+        return _baseNode.nodeNumber
     }
     
     public var value: N? {
@@ -69,7 +69,7 @@ public struct SubGraphNodeCollection<N, E>: NodeCollection {
     public typealias Iterator = SubGraphNodeIterator<N,E>
     
     public var count: Int {
-        return _graph._nodeIDs.count
+        return _graph._nodeNumbers.count
     }
         
     internal weak var _graph: SubGraph<N, E>!
@@ -78,8 +78,8 @@ public struct SubGraphNodeCollection<N, E>: NodeCollection {
         self._graph = graph
     }
     
-    public func contains(_ id: NodeID) -> Bool {
-        return _graph._nodeIDs.contains(id)
+    public func contains(_ nodeNumber: Int) -> Bool {
+        return _graph._nodeNumbers.contains(nodeNumber)
     }
     
     public func makeIterator() -> SubGraphNodeIterator<N,E> {
@@ -87,8 +87,8 @@ public struct SubGraphNodeCollection<N, E>: NodeCollection {
     }
     
     public func randomElement() -> NodeType? {
-        if let randomId = _graph._nodeIDs.randomElement(),
-           let baseNode = _graph.baseGraph.nodes[randomId] {
+        if let randomNodeNumber = _graph._nodeNumbers.randomElement(),
+           let baseNode = _graph.baseGraph.nodes[randomNodeNumber] {
             return SubGraphNode<N, E>(_graph, baseNode)
         }
         else {
@@ -96,9 +96,9 @@ public struct SubGraphNodeCollection<N, E>: NodeCollection {
         }
     }
     
-    public subscript(id: NodeID) -> NodeType? {
-        if _graph._nodeIDs.contains(id),
-           let baseNode = _graph.baseGraph._nodes[id] {
+    public subscript(nodeNumber: Int) -> NodeType? {
+        if _graph._nodeNumbers.contains(nodeNumber),
+           let baseNode = _graph.baseGraph._nodes[nodeNumber] {
             return SubGraphNode<N, E>(_graph, baseNode)
         }
         else {
@@ -132,8 +132,8 @@ public struct SubGraphNodeIterator<N,E>: IteratorProtocol {
         self._graph = graph
     }
     
-    private func makeInnerIterator() -> Dictionary<NodeID, BaseGraphNode<N, E>>.Iterator {
-        return _graph.baseGraph._nodes._dict.filter({ _graph._nodeIDs.contains($0.value.id) }).makeIterator()
+    private func makeInnerIterator() -> Dictionary<Int, BaseGraphNode<N, E>>.Iterator {
+        return _graph.baseGraph._nodes.nodesByNodeNumber.filter({ _graph._nodeNumbers.contains($0.value.nodeNumber) }).makeIterator()
     }
 }
 
@@ -151,8 +151,8 @@ public class SubGraphEdge<N, E>: Edge {
     public typealias ValueType = E
     public typealias NodeType = SubGraphNode<N, E>
     
-    public var id: EdgeID {
-        return _baseEdge.id
+    public var edgeNumber: Int {
+        return _baseEdge.edgeNumber
     }
     
     public var value: E? {
@@ -196,7 +196,7 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public var count: Int {
-        return _baseNode._inEdges._dict.filter({ _graph.nodes.contains($0.value._source.id) }).count
+        return _baseNode._inEdges.edgesByEdgeNumber.filter({ _graph.nodes.contains($0.value._source.nodeNumber) }).count
     }
             
     internal weak var _graph: SubGraph<N, E>!
@@ -208,9 +208,9 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
         self._graph = graph
     }
     
-    public func contains(_ id: EdgeID) -> Bool {
-        if let sourceID = _baseNode.inEdges[id]?._source.id {
-            return _graph.nodes.contains(sourceID)
+    public func contains(_ edgeNumber: Int) -> Bool {
+        if let sourceNodeNumber = _baseNode.inEdges[edgeNumber]?._source.nodeNumber {
+            return _graph.nodes.contains(sourceNodeNumber)
         }
         else {
             return false
@@ -219,7 +219,7 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
-        if let baseEdge =  _graph.baseGraph._edges._dict.filter({ _graph._nodeIDs.contains($0.value._source.id) }).randomElement()?.value {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._source.nodeNumber) }).randomElement()?.value {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -227,8 +227,8 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
         }
     }
     
-    public subscript(id: EdgeID) -> SubGraphEdge<N, E>? {
-        if let baseEdge = _baseNode._inEdges[id], _graph._nodeIDs.contains(baseEdge._source.id) {
+    public subscript(edgeNumber: Int) -> SubGraphEdge<N, E>? {
+        if let baseEdge = _baseNode._inEdges[edgeNumber], _graph._nodeNumbers.contains(baseEdge._source.nodeNumber) {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -268,8 +268,8 @@ public struct SubGraphInEdgeIterator<N, E>: IteratorProtocol {
         self._baseNode = sequence._baseNode
     }
     
-    private func makeInnerIterator() -> Dictionary<EdgeID, BaseGraphEdge<N, E>>.Iterator {
-        return _baseNode._inEdges._dict.filter({ _graph._nodeIDs.contains($0.value._source.id) }).makeIterator()
+    private func makeInnerIterator() -> Dictionary<Int, BaseGraphEdge<N, E>>.Iterator {
+        return _baseNode._inEdges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._source.nodeNumber) }).makeIterator()
     }
 }
 
@@ -283,7 +283,7 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public var count: Int {
-        return _baseNode._outEdges._dict.filter({ _graph._nodeIDs.contains($0.value._target.id) }).count
+        return _baseNode._outEdges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._target.nodeNumber) }).count
     }
             
     internal weak var _graph: SubGraph<N, E>!
@@ -295,9 +295,9 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
         self._graph = graph
     }
     
-    public func contains(_ id: EdgeID) -> Bool {
-        if let destinationId = _baseNode._outEdges[id]?._target.id {
-            return _graph._nodeIDs.contains(destinationId)
+    public func contains(_ edgeNumber: Int) -> Bool {
+        if let destinationNodeNumber = _baseNode._outEdges[edgeNumber]?._target.nodeNumber {
+            return _graph._nodeNumbers.contains(destinationNodeNumber)
         }
         else {
             return false
@@ -306,7 +306,7 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
-        if let baseEdge =  _graph.baseGraph._edges._dict.filter({ _graph._nodeIDs.contains($0.value._target.id) }).randomElement()?.value {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._target.nodeNumber) }).randomElement()?.value {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -314,8 +314,8 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
         }
     }
     
-    public subscript(id: EdgeID) -> EdgeType? {
-        if let baseEdge = _baseNode._outEdges[id], _graph._nodeIDs.contains(baseEdge._target.id) {
+    public subscript(edgeNumber: Int) -> EdgeType? {
+        if let baseEdge = _baseNode._outEdges[edgeNumber], _graph._nodeNumbers.contains(baseEdge._target.nodeNumber) {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -355,8 +355,8 @@ public struct SubGraphOutEdgeIterator<N, E>: IteratorProtocol {
         self._baseNode = sequence._baseNode
     }
     
-    private func makeInnerIterator() -> Dictionary<EdgeID, BaseGraphEdge<N, E>>.Iterator {
-        return _baseNode._outEdges._dict.filter({ _graph._nodeIDs.contains($0.value._target.id) }).makeIterator()
+    private func makeInnerIterator() -> Dictionary<Int, BaseGraphEdge<N, E>>.Iterator {
+        return _baseNode._outEdges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._target.nodeNumber) }).makeIterator()
     }
 }
 
@@ -370,8 +370,8 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
             
     /// INEFFICIENT
     public var count: Int {
-        return _graph.baseGraph._edges._dict.filter({
-            _graph._nodeIDs.contains($0.value._source.id) && _graph._nodeIDs.contains($0.value._target.id)
+        return _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._source.nodeNumber) && _graph._nodeNumbers.contains($0.value._target.nodeNumber)
         }).count
     }
             
@@ -381,9 +381,9 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
         self._graph = graph
     }
     
-    public func contains(_ id: EdgeID) -> Bool {
-        if let baseEdge = _graph.baseGraph.edges[id] {
-            return _graph._nodeIDs.contains(baseEdge._source.id) && _graph._nodeIDs.contains(baseEdge._target.id)
+    public func contains(_ edgeNumber: Int) -> Bool {
+        if let baseEdge = _graph.baseGraph.edges[edgeNumber] {
+            return _graph._nodeNumbers.contains(baseEdge._source.nodeNumber) && _graph._nodeNumbers.contains(baseEdge._target.nodeNumber)
         }
         else {
             return false
@@ -392,8 +392,8 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
-        if let baseEdge =  _graph.baseGraph._edges._dict.filter({
-            _graph._nodeIDs.contains($0.value._source.id) && _graph._nodeIDs.contains($0.value._target.id)
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._source.nodeNumber) && _graph._nodeNumbers.contains($0.value._target.nodeNumber)
         }).randomElement()?.value {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
@@ -402,10 +402,10 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
         }
     }
     
-    public subscript(id: EdgeID) -> EdgeType? {
-        if let baseEdge = _graph.baseGraph._edges[id],
-           _graph._nodeIDs.contains(baseEdge._source.id),
-           _graph._nodeIDs.contains(baseEdge._target.id) {
+    public subscript(edgeNumber: Int) -> EdgeType? {
+        if let baseEdge = _graph.baseGraph._edges[edgeNumber],
+           _graph._nodeNumbers.contains(baseEdge._source.nodeNumber),
+           _graph._nodeNumbers.contains(baseEdge._target.nodeNumber) {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -442,9 +442,9 @@ public struct SubGraphEdgeIterator<N, E>: IteratorProtocol {
         self._graph = edges._graph
     }
     
-    private func makeInnerIterator() -> Dictionary<EdgeID, BaseGraphEdge<N, E>>.Iterator {
-        return _graph.baseGraph._edges._dict.filter({
-            _graph._nodeIDs.contains($0.value.source.id) && _graph._nodeIDs.contains($0.value.target.id)
+    private func makeInnerIterator() -> Dictionary<Int, BaseGraphEdge<N, E>>.Iterator {
+        return _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value.source.nodeNumber) && _graph._nodeNumbers.contains($0.value.target.nodeNumber)
         }).makeIterator()
     }
 }
@@ -477,47 +477,47 @@ public class SubGraph<N, E>: Graph {
     
     public let baseGraph: BaseGraph<N, E>
     
-    internal var _nodeIDs: Set<NodeID>
+    internal var _nodeNumbers: Set<Int>
     
     lazy internal var _nodes = SubGraphNodeCollection<N,E>(self)
     
     lazy internal var _edges = SubGraphEdgeCollection<N,E>(self)
     
-    public init<S: Sequence>(_ baseGraph: BaseGraph<N, E>, _ nodeIDs: S) where S.Element == NodeID {
+    public init<S: Sequence>(_ baseGraph: BaseGraph<N, E>, _ nodeNumbers: S) where S.Element == Int {
         self.baseGraph = baseGraph
 
-        let validNodeIDs = Set<NodeID>(baseGraph._nodes.map({$0.id}))
-        let givenNodeIDs = Set<NodeID>(nodeIDs)
-        self._nodeIDs = validNodeIDs.intersection(givenNodeIDs)
+        let validNodeNumbers = Set<Int>(baseGraph._nodes.map({$0.nodeNumber}))
+        let givenNodeNumbers = Set<Int>(nodeNumbers)
+        self._nodeNumbers = validNodeNumbers.intersection(givenNodeNumbers)
     }
 
     public convenience init(_ baseGraph: BaseGraph<N, E>) {
-        self.init(baseGraph, Set<NodeID>())
+        self.init(baseGraph, Set<Int>())
     }
 
     public convenience init(_ subgraph: SubGraph<N, E>) {
-        self.init(subgraph.baseGraph, subgraph._nodeIDs)
+        self.init(subgraph.baseGraph, subgraph._nodeNumbers)
     }
 
-    public convenience init(_ subgraph: SubGraph<N, E>, _ nodeIDs: Set<NodeID>) {
-        self.init(subgraph.baseGraph, nodeIDs.intersection(subgraph._nodeIDs))
+    public convenience init(_ subgraph: SubGraph<N, E>, _ nodeNumbers: Set<Int>) {
+        self.init(subgraph.baseGraph, nodeNumbers.intersection(subgraph._nodeNumbers))
     }
 
-    public func subgraph(_ nodeIDs: Set<NodeID>) -> SubGraph<N, E> {
-        return SubGraph<N, E>(self, nodeIDs)
+    public func subgraph(_ nodeNumbers: Set<Int>) -> SubGraph<N, E> {
+        return SubGraph<N, E>(self, nodeNumbers)
     }
     
-    @discardableResult public func addNode(id: NodeID) throws -> SubGraphNode<N, E> {
-        if let baseNode = baseGraph.nodes[id] {
-            _nodeIDs.insert(id)
+    @discardableResult public func addNode(nodeNumber: Int) throws -> SubGraphNode<N, E> {
+        if let baseNode = baseGraph.nodes[nodeNumber] {
+            _nodeNumbers.insert(nodeNumber)
             return SubGraphNode<N, E>(self, baseNode)
         }
         else {
-            throw GraphError.noSuchNode(id: id)
+            throw GraphError.noSuchNode(nodeNumber: nodeNumber)
         }
     }
     
-    public func removeNode(id: NodeID) {
-        _nodeIDs.remove(id)
+    public func removeNode(nodeNumber: Int) {
+        _nodeNumbers.remove(nodeNumber)
     }
 }

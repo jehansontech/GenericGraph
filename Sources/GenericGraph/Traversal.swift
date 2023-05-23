@@ -32,8 +32,8 @@ public enum Direction: String, CaseIterable, Codable, Sendable {
 ///
 public class Step<EdgeType: Edge>: Hashable, Equatable {
     
-    public var edgeID: EdgeID {
-        return _edge.id
+    public var edgeNumber: Int {
+        return _edge.edgeNumber
     }
     
     public var edgeValue: EdgeType.ValueType? {
@@ -77,12 +77,12 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(edgeID)
+        hasher.combine(edgeNumber)
         hasher.combine(direction)
     }
 
     public static func ==<EdgeType: Edge>(lhs: Step<EdgeType>, rhs: Step<EdgeType>) -> Bool {
-        return lhs.edgeID == rhs.edgeID && lhs.direction == rhs.direction
+        return lhs.edgeNumber == rhs.edgeNumber && lhs.direction == rhs.direction
     }
 }
 
@@ -107,17 +107,17 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
         self.direction = direction
     }
     
-    public func contains(_ id: EdgeID) -> Bool {
+    public func contains(edgeNumber: Int) -> Bool {
         if let direction = direction {
             switch direction {
             case .forward:
-                return _node.outEdges.contains(id)
+                return _node.outEdges.contains(edgeNumber)
             case .backward:
-                return _node.inEdges.contains(id)
+                return _node.inEdges.contains(edgeNumber)
             }
         }
         else {
-            return _node.outEdges.contains(id) || _node.inEdges.contains(id)
+            return _node.outEdges.contains(edgeNumber) || _node.inEdges.contains(edgeNumber)
         }
     }
     
@@ -170,22 +170,22 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
         }
     }
 
-    public subscript(_ id: EdgeID) -> Step<EdgeType>? {
+    public subscript(_ edgeNumber: Int) -> Step<EdgeType>? {
         if let direction = direction {
             switch direction {
             case .forward:
-                return forwardStep(withID: id)
+                return forwardStep(withEdgeNumber: edgeNumber)
             case .backward:
-                return backwardStep(withID: id)
+                return backwardStep(withEdgeNumber: edgeNumber)
             }
         }
         else {
-            return anyStep(withID: id)
+            return anyStep(withEdgeNumber: edgeNumber)
         }
     }
 
-    private func forwardStep(withID id: EdgeID) -> Step<EdgeType>? {
-        if let edge = _node.outEdges[id] as? EdgeType {
+    private func forwardStep(withEdgeNumber edgeNumber: Int) -> Step<EdgeType>? {
+        if let edge = _node.outEdges[edgeNumber] as? EdgeType {
             return Step<EdgeType>(edge, .forward)
         }
         else {
@@ -193,8 +193,8 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
         }
     }
 
-    private func backwardStep(withID id: EdgeID) -> Step<EdgeType>? {
-        if let edge = _node.inEdges[id] as? EdgeType {
+    private func backwardStep(withEdgeNumber edgeNumber: Int) -> Step<EdgeType>? {
+        if let edge = _node.inEdges[edgeNumber] as? EdgeType {
             return Step<EdgeType>(edge, .backward)
         }
         else {
@@ -202,11 +202,11 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
         }
     }
 
-    private func anyStep(withID id: EdgeID) -> Step<EdgeType>? {
-        if let edge = _node.outEdges[id] as? EdgeType {
+    private func anyStep(withEdgeNumber edgeNumber: Int) -> Step<EdgeType>? {
+        if let edge = _node.outEdges[edgeNumber] as? EdgeType {
             return Step<EdgeType>(edge, .forward)
         }
-        else if let edge = _node.inEdges[id] as? EdgeType {
+        else if let edge = _node.inEdges[edgeNumber] as? EdgeType {
             return Step<EdgeType>(edge, .backward)
         }
         else {
@@ -260,7 +260,7 @@ public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
 
 
 public enum PathError: Error {
-    case disconnectedPath(destination1: NodeID, origin2: NodeID)
+    case disconnectedPath(destination1: Int, origin2: Int)
 }
 
 
@@ -305,8 +305,8 @@ public struct Path<EdgeType: Edge> {
     }
 
     public func append(_ step: Step<EdgeType>) throws -> Path<EdgeType> {
-        if self.destination.id != step.origin.id {
-            throw PathError.disconnectedPath(destination1: self.destination.id, origin2: step.origin.id)
+        if self.destination.nodeNumber != step.origin.nodeNumber {
+            throw PathError.disconnectedPath(destination1: self.destination.nodeNumber, origin2: step.origin.nodeNumber)
         }
         var newPath = Path<EdgeType>(_origin, _steps)
         newPath._steps.append(step)
@@ -314,8 +314,8 @@ public struct Path<EdgeType: Edge> {
     }
     
     public func append(_ path: Path<EdgeType>) throws -> Path<EdgeType> {
-        if self.destination.id != path.origin.id {
-            throw PathError.disconnectedPath(destination1: self.destination.id, origin2: path.origin.id)
+        if self.destination.nodeNumber != path.origin.nodeNumber {
+            throw PathError.disconnectedPath(destination1: self.destination.nodeNumber, origin2: path.origin.nodeNumber)
         }
         var newPath = Path<EdgeType>(_origin, _steps)
         for step in path.steps {
@@ -409,7 +409,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
     
     private var _frontier = Frontier()
     
-    private var _visited = Set<NodeID>()
+    private var _visited = Set<Int>()
     
     public init(_ origin: NodeType, _ radius: Int, _ direction: Direction?) {
         self.radius = radius
@@ -422,7 +422,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
             if path.length < radius {
                 let steps = StepCollection<NodeType.EdgeType>(path.destination, direction)
                 for step in steps {
-                    if !_visited.contains(step.destination.id) {
+                    if !_visited.contains(step.destination.nodeNumber) {
                         try! push(path.append(step))
                     }
                 }
@@ -436,7 +436,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
     
     private mutating func push(_ path: Path<NodeType.EdgeType>) {
         _frontier.addLast(path)
-        _visited.insert(path.destination.id)
+        _visited.insert(path.destination.nodeNumber)
     }
     
     private mutating func pop() -> Path<NodeType.EdgeType>? {
@@ -457,13 +457,13 @@ extension Node {
         return StepCollection<EdgeType>(self as! EdgeType.NodeType, direction)
     }
 
-    public func nearestNeighbors() -> [NodeID] {
-        var nbrs = [NodeID]()
+    public func nearestNeighbors() -> [Int] {
+        var nbrs = [Int]()
         self.outEdges.forEach {
-            nbrs.append($0.target.id)
+            nbrs.append($0.target.nodeNumber)
         }
         self.inEdges.forEach {
-            nbrs.append($0.source.id)
+            nbrs.append($0.source.nodeNumber)
         }
         return nbrs
     }
@@ -483,23 +483,23 @@ extension Node {
 ///
 extension Graph {
         
-    /// returns IDs of nodes with inDegree 0
-    public func sourceNodes() -> Set<NodeID> {
-        var sources = Set<NodeID>()
+    /// returns nodeNunbers of nodes with inDegree 0
+    public func sourceNodes() -> Set<Int> {
+        var sources = Set<Int>()
         for node in nodes {
             if node.inDegree == 0 {
-                sources.insert(node.id)
+                sources.insert(node.nodeNumber)
             }
         }
         return sources
     }
 
-    /// returns IDs of nodes with outDegree 0
-    public func sinkNodes() -> Set<NodeID> {
-        var sinks = Set<NodeID>()
+    /// returns nodeNumbers of nodes with outDegree 0
+    public func sinkNodes() -> Set<Int> {
+        var sinks = Set<Int>()
         for node in nodes {
             if node.outDegree == 0 {
-                sinks.insert(node.id)
+                sinks.insert(node.nodeNumber)
             }
         }
         return sinks
@@ -508,13 +508,13 @@ extension Graph {
     public func components(_ direction: Direction? = nil) -> [SubGraphType] {
         var subgraphs = [SubGraphType]()
 
-        var visited = Set<NodeID>()
+        var visited = Set<Int>()
         for node in self.nodes {
-            if visited.contains(node.id) {
+            if visited.contains(node.nodeNumber) {
                 continue
             }
             
-            let reachable: Set<NodeID> = reachableFrom(nodeID: node.id, direction)
+            let reachable: Set<Int> = reachableFrom(nodeNumber: node.nodeNumber, direction)
             visited.formUnion(reachable)
             subgraphs.append(subgraph(reachable))
         }
@@ -522,22 +522,22 @@ extension Graph {
         return subgraphs
     }
 
-    public func reachableFrom(nodeID: NodeID, _ direction: Direction? = nil) -> Set<NodeID> {
-        var reached = Set<NodeID>()
-        var frontier = Set<NodeID>()
-        frontier.insert(nodeID)
+    public func reachableFrom(nodeNumber: Int, _ direction: Direction? = nil) -> Set<Int> {
+        var reached = Set<Int>()
+        var frontier = Set<Int>()
+        frontier.insert(nodeNumber)
         while (!frontier.isEmpty) {
-            let nodeID = frontier.removeFirst()
-            if !reached.contains(nodeID), let node = self.nodes[nodeID]  {
-                reached.insert(nodeID)
+            let nodeNumber = frontier.removeFirst()
+            if !reached.contains(nodeNumber), let node = self.nodes[nodeNumber]  {
+                reached.insert(nodeNumber)
                 if (direction == nil || direction! == .forward) {
                     for edge in node.inEdges {
-                        frontier.insert(edge.source.id)
+                        frontier.insert(edge.source.nodeNumber)
                     }
                 }
                 if (direction == nil || direction! == .backward) {
                     for edge in node.outEdges {
-                        frontier.insert(edge.target.id)
+                        frontier.insert(edge.target.nodeNumber)
                     }
                 }
             }

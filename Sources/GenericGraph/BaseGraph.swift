@@ -20,7 +20,7 @@ public class BaseGraphNode<N, E>: Node {
     public typealias InEdgeCollectionType = BaseGraphEdgeCollection<N, E>
     public typealias OutEdgeCollectionType = BaseGraphEdgeCollection<N, E>
 
-    public let id: NodeID
+    public let nodeNumber: Int
     
     public var value: N?
     
@@ -36,14 +36,14 @@ public class BaseGraphNode<N, E>: Node {
     
     internal lazy var _outEdges = BaseGraphEdgeCollection<N, E>()
     
-    public init(_ id: NodeID, _ value: N?) {
-        self.id = id
+    public init(_ nodeNumber: Int, _ value: N?) {
+        self.nodeNumber = nodeNumber
         self.value = value
     }
     
     deinit {
-        _inEdges._dict.removeAll()
-        _outEdges._dict.removeAll()
+        _inEdges.edgesByEdgeNumber.removeAll()
+        _outEdges.edgesByEdgeNumber.removeAll()
     }
 }
 
@@ -52,29 +52,30 @@ public class BaseGraphNode<N, E>: Node {
 ///
 ///
 public struct BaseGraphNodeCollection<N, E>: NodeCollection {
+
     public typealias NodeType = BaseGraphNode<N, E>
     public typealias Iterator = BaseGraphNodeIterator<N, E>
     
     public var isEmpty: Bool {
-        return _dict.isEmpty
+        return nodesByNodeNumber.isEmpty
     }
 
     public var count: Int {
-        return _dict.count
+        return nodesByNodeNumber.count
     }
     
-    internal var _dict = Dictionary<NodeID, BaseGraphNode<N, E>>()
+    internal var nodesByNodeNumber = Dictionary<Int, BaseGraphNode<N, E>>()
     
-    public func contains(_ id: NodeID) -> Bool {
-        return _dict[id] != nil
+    public func contains(_ nodeNumber: Int) -> Bool {
+        return nodesByNodeNumber[nodeNumber] != nil
     }
     
     public func randomElement() -> BaseGraphNode<N, E>? {
-        return _dict.randomElement()?.value
+        return nodesByNodeNumber.randomElement()?.value
     }
     
-    public subscript(id: NodeID) -> BaseGraphNode<N, E>? {
-        return _dict[id]
+    public subscript(nodeNumber: Int) -> BaseGraphNode<N, E>? {
+        return nodesByNodeNumber[nodeNumber]
     }
 
     public func makeIterator() -> BaseGraphNodeIterator<N, E> {
@@ -89,10 +90,10 @@ public struct BaseGraphNodeCollection<N, E>: NodeCollection {
 public struct BaseGraphNodeIterator<N, E>: IteratorProtocol {
     public typealias Element = BaseGraphNode<N, E>
 
-    internal var _innerIterator: Dictionary<NodeID, BaseGraphNode<N, E>>.Iterator
+    internal var _innerIterator: Dictionary<Int, BaseGraphNode<N, E>>.Iterator
     
     public init(_ nodes: BaseGraphNodeCollection<N, E>) {
-        self._innerIterator = nodes._dict.makeIterator()
+        self._innerIterator = nodes.nodesByNodeNumber.makeIterator()
     }
 
     public mutating func next() -> BaseGraphNode<N, E>? {
@@ -113,7 +114,7 @@ public class BaseGraphEdge<N, E>: Edge {
     public typealias ValueType = E
     public typealias NodeType = BaseGraphNode<N, E>
     
-    public var id: EdgeID
+    public var edgeNumber: Int
     
     public var value: E?
     
@@ -129,8 +130,8 @@ public class BaseGraphEdge<N, E>: Edge {
     
     internal weak var _target: BaseGraphNode<N, E>!
     
-    public init(_ id: EdgeID, _ value: E?, _ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>) {
-        self.id = id
+    public init(_ edgeNumber: Int, _ value: E?, _ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>) {
+        self.edgeNumber = edgeNumber
         self.value = value
         self._source = source
         self._target = target
@@ -146,25 +147,25 @@ public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
     public typealias Iterator = BaseGraphEdgeIterator<N, E>
 
     public var isEmpty: Bool {
-        return _dict.isEmpty
+        return edgesByEdgeNumber.isEmpty
     }
 
     public var count: Int {
-        return _dict.count
+        return edgesByEdgeNumber.count
     }
     
-    internal var _dict =  Dictionary<EdgeID, BaseGraphEdge<N, E>>()
+    internal var edgesByEdgeNumber =  Dictionary<Int, BaseGraphEdge<N, E>>()
     
-    public func contains(_ id: EdgeID) -> Bool {
-        return _dict[id] != nil
+    public func contains(_ edgeNumber: Int) -> Bool {
+        return edgesByEdgeNumber[edgeNumber] != nil
     }
     
     public func randomElement() -> BaseGraphEdge<N, E>? {
-        return _dict.randomElement()?.value
+        return edgesByEdgeNumber.randomElement()?.value
     }
     
-    public subscript(id: EdgeID) -> BaseGraphEdge<N, E>? {
-        return _dict[id]
+    public subscript(edgeNumber: Int) -> BaseGraphEdge<N, E>? {
+        return edgesByEdgeNumber[edgeNumber]
     }
 
     public func makeIterator() -> BaseGraphEdgeIterator<N, E> {
@@ -179,10 +180,10 @@ public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
 public struct BaseGraphEdgeIterator<N, E>: IteratorProtocol {
     public typealias Element = BaseGraphEdge<N, E>
     
-    internal var _innerIterator: Dictionary<EdgeID, BaseGraphEdge<N, E>>.Iterator
+    internal var _innerIterator: Dictionary<Int, BaseGraphEdge<N, E>>.Iterator
     
     public init(_ edges: BaseGraphEdgeCollection<N,E>) {
-        self._innerIterator = edges._dict.makeIterator()
+        self._innerIterator = edges.edgesByEdgeNumber.makeIterator()
     }
     
     public mutating func next() -> BaseGraphEdge<N, E>? {
@@ -217,96 +218,96 @@ public class BaseGraph<N, E>: Graph {
     
     internal var _nodes = BaseGraphNodeCollection<N,E>()
     
-    internal var _nextNodeID: NodeID = 0
+    internal var _nextNodeNumber: Int = 0
     
     internal var _edges = BaseGraphEdgeCollection<N, E>()
     
-    internal var _nextEdgeID: EdgeID = 0
+    internal var _nextEdgeNumber: Int = 0
             
     public init() {}
         
-    public func subgraph<S: Sequence>(_ nodeIDs: S) -> SubGraph<N, E> where S.Element == NodeID {
-        return SubGraph<N, E>(self, nodeIDs)
+    public func subgraph<S: Sequence>(_ nodeNumbers: S) -> SubGraph<N, E> where S.Element == Int {
+        return SubGraph<N, E>(self, nodeNumbers)
     }
 
     // TODO: determine whether this is safe
-    //    @discardableResult public func addNode(_ id: NodeID, _ value: N? = nil) throws -> BaseGraphNode<N, E> {
-    //        if _nodes._dict[id] != nil {
-    //            throw GraphError.nodeExists(id: id)
+    //    @discardableResult public func addNode(_ nodeNumber: Int, _ value: N? = nil) throws -> BaseGraphNode<N, E> {
+    //        if _nodes._dict[nodeNumber] != nil {
+    //            throw GraphError.nodeExists(nodeNumber: nodeNumber)
     //        }
     //
-    //        _nextNodeID = max(id, _nextNodeID) + 1
+    //        _nextNodeNumber = max(nodeNumber, _nextNodeNumber) + 1
     //
-    //        let newNode = BaseGraphNode<N, E>(id, value)
-    //        _nodes._dict[id] = newNode
+    //        let newNode = BaseGraphNode<N, E>(nodeNumber, value)
+    //        _nodes._dict[nodeNumber] = newNode
     //        return newNode
     //    }
 
     @discardableResult public func addNode(_ value: N? = nil) -> BaseGraphNode<N, E> {
-        let id = _nextNodeID
-        _nextNodeID += 1
+        let newNodeNumber = _nextNodeNumber
+        _nextNodeNumber += 1
         
-        let newNode = BaseGraphNode<N, E>(id, value)
-        _nodes._dict[id] = newNode
+        let newNode = BaseGraphNode<N, E>(newNodeNumber, value)
+        _nodes.nodesByNodeNumber[newNodeNumber] = newNode
         return newNode
     }
     
-    public func removeNode(_ id: NodeID) {
-        if let node = _nodes._dict.removeValue(forKey: id) {
+    public func removeNode(_ nodeNumber: Int) {
+        if let node = _nodes.nodesByNodeNumber.removeValue(forKey: nodeNumber) {
             for edge in node._inEdges {
-                removeEdge(edge.id)
+                removeEdge(edge.edgeNumber)
             }
             for edge in node._outEdges {
-                removeEdge(edge.id)
+                removeEdge(edge.edgeNumber)
             }
         }
     }
 
-    public func removeNodes<S: Sequence>(_ ids: S) where S.Element == NodeID {
-        ids.forEach({ removeNode($0) })
+    public func removeNodes<S: Sequence>(_ nodeNumbers: S) where S.Element == Int {
+        nodeNumbers.forEach({ removeNode($0) })
     }
 
-    @discardableResult public func addEdge(_ from: NodeID, _ to: NodeID, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
+    @discardableResult public func addEdge(_ from: Int, _ to: Int, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
             let source = _nodes[from]
         else {
-            throw GraphError.noSuchNode(id: from)
+            throw GraphError.noSuchNode(nodeNumber: from)
         }
         
         guard
             let target = _nodes[to]
         else {
-            throw GraphError.noSuchNode(id: to)
+            throw GraphError.noSuchNode(nodeNumber: to)
         }
         
         return uncheckedAddEdge(source, target, value)
     }
 
     @discardableResult public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E? = nil) -> BaseGraphEdge<N, E> {
-        let id = _nextEdgeID
-        _nextEdgeID += 1
+        let newEdgeNumber = _nextEdgeNumber
+        _nextEdgeNumber += 1
 
-        let newEdge = BaseGraphEdge<N, E>(id, value, source, target)
-        _edges._dict[id] = newEdge
-        source._outEdges._dict[id] = newEdge
-        target._inEdges._dict[id] = newEdge
+        let newEdge = BaseGraphEdge<N, E>(newEdgeNumber, value, source, target)
+        _edges.edgesByEdgeNumber[newEdgeNumber] = newEdge
+        source._outEdges.edgesByEdgeNumber[newEdgeNumber] = newEdge
+        target._inEdges.edgesByEdgeNumber[newEdgeNumber] = newEdge
         return newEdge
     }
 
-    public func removeEdge(_ id: EdgeID) {
-        if let edge = _edges._dict.removeValue(forKey: id) {
-            edge._source._outEdges._dict.removeValue(forKey: id)
-            edge._target._inEdges._dict.removeValue(forKey: id)
+    public func removeEdge(_ edgeNumber: Int) {
+        if let edge = _edges.edgesByEdgeNumber.removeValue(forKey: edgeNumber) {
+            edge._source._outEdges.edgesByEdgeNumber.removeValue(forKey: edgeNumber)
+            edge._target._inEdges.edgesByEdgeNumber.removeValue(forKey: edgeNumber)
         }
     }
 
-    public func removeEdges<S: Sequence>(_ ids: S) where S.Element == EdgeID {
-        ids.forEach({ removeEdge($0) })
+    public func removeEdges<S: Sequence>(_ edgeNumbers: S) where S.Element == Int {
+        edgeNumbers.forEach({ removeEdge($0) })
     }
 
     public func clearAll() {
-        _edges._dict.removeAll()
-        _nodes._dict.removeAll()
+        _edges.edgesByEdgeNumber.removeAll()
+        _nodes.nodesByNodeNumber.removeAll()
     }
 
 }

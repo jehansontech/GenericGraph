@@ -29,12 +29,12 @@ node2.value = "another node"
 
 __Edges are created in a similar fashion.__
 
-Note that the edge's source and target nodes are specified via node ID.
+Note that the edge's source and target nodes are specified via node number.
 
 ```
-var edge1 = try graph1.addEdge(node1.id, node2.id, 101)
+var edge1 = try graph1.addEdge(node1.nodeNumber, node2.nodeNumber, 101)
 
-var edge2 = try graph1.addEdge(node2.id, node1.id) 
+var edge2 = try graph1.addEdge(node2.nodeNumber, node1.nodeNumber) 
 edge2.value = 102
 ```
 
@@ -77,17 +77,17 @@ __You can create a subgraph of any graph, including another subgraph.__
 
 A subgraph provides a view over nodes in a base graph.
 
-The subgraph's nodes are specified by ID and may be given when the subgraph is created or may be added later.
+The subgraph's nodes are specified by node number and may be given when the subgraph is created or may be added later.
 
 ```
-let nodeIDs = Set<NodeID>()
-nodeIDs.insert(node1.id)
-let subgraph1 = graph1.subgraph(nodeIDs)
+let nodeNumbers = Set<Int>()
+nodeNumbers.insert(node1.nodeNumber)
+let subgraph1 = graph1.subgraph(nodeNumbers)
 
-subgraph1.addNode(node2.id)
+subgraph1.addNode(node2.nodeNumber)
 
 let subgraph2 = subgraph1.subgraph() // subgraph2 is empty at this point
-subgraph2.addNode(node1.id)
+subgraph2.addNode(node1.nodeNumber)
 ```
 
 __Navigation over the nodes in a graph is done via Steps.__

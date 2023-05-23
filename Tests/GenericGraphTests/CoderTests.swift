@@ -28,9 +28,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph.addNode(Foo("n0"))
         let n1 = graph.addNode(Foo("n1"))
         let n2 = graph.addNode(Foo("n2"))
-        try graph.addEdge(n0.id, n1.id, Foo("e01"))
-        try graph.addEdge(n1.id, n2.id, Foo("e12"))
-        try graph.addEdge(n2.id, n0.id, Foo("e20"))
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -44,9 +44,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph.addNode("n0")
         let n1 = graph.addNode("n1")
         let n2 = graph.addNode("n2")
-        try graph.addEdge(n0.id, n1.id, Foo("e01"))
-        try graph.addEdge(n1.id, n2.id, Foo("e12"))
-        try graph.addEdge(n2.id, n0.id, Foo("e20"))
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
         
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -60,9 +60,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph.addNode(Foo("n0"))
         let n1 = graph.addNode(Foo("n1"))
         let n2 = graph.addNode(Foo("n2"))
-        try graph.addEdge(n0.id, n1.id, "e01")
-        try graph.addEdge(n1.id, n2.id, "e12")
-        try graph.addEdge(n2.id, n0.id, "e20")
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
         
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -76,9 +76,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph.addNode("n0")
         let n1 = graph.addNode("n1")
         let n2 = graph.addNode("n2")
-        try graph.addEdge(n0.id, n1.id, "e01")
-        try graph.addEdge(n1.id, n2.id, "e12")
-        try graph.addEdge(n2.id, n0.id, "e20")
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -93,19 +93,19 @@ final class CoderTests: XCTestCase {
             {
                 "nodes": [
                     {
-                        "id":0,
+                        "nodeNumber":0,
                         "outEdges": [
                             { "target": 1 }
                         ]
                     },
                     {
-                        "id": 1,
+                        "nodeNumber": 1,
                         "outEdges": [
                             { "target": 2 }
                         ]
                     },
                     {
-                        "id": 2,
+                        "nodeNumber": 2,
                         "outEdges": [
                             { "target": 0 }
                         ]
@@ -137,21 +137,21 @@ final class CoderTests: XCTestCase {
             {
                 "nodes": [
                     {
-                        "id":0,
+                        "nodeNumber":0,
                         "value": "n0",
                         "outEdges": [
                             { "target": 1 }
                         ]
                     },
                     {
-                        "id": 1,
+                        "nodeNumber": 1,
                         "value": "n1",
                         "outEdges": [
                             { "target": 2 }
                         ]
                     },
                     {
-                        "id": 2,
+                        "nodeNumber": 2,
                         "value": "n2",
                         "outEdges": [
                             { "target": 0 }
@@ -184,19 +184,19 @@ final class CoderTests: XCTestCase {
             {
                 "nodes": [
                     {
-                        "id":0,
+                        "nodeNumber":0,
                         "outEdges": [
                             { "value": "e01", "target": 1 }
                         ]
                     },
                     {
-                        "id": 1,
+                        "nodeNumber": 1,
                         "outEdges": [
                             { "value": "e12", "target": 2 }
                         ]
                     },
                     {
-                        "id": 2,
+                        "nodeNumber": 2,
                         "outEdges": [
                             { "value": "e20", "target": 0 }
                         ]
@@ -228,21 +228,21 @@ final class CoderTests: XCTestCase {
             {
                 "nodes": [
                     {
-                        "id":0,
+                        "nodeNumber":0,
                         "value": "n0",
                         "outEdges": [
                             { "value": "e01", "target": 1 }
                         ]
                     },
                     {
-                        "id": 1,
+                        "nodeNumber": 1,
                         "value": "n1",
                         "outEdges": [
                             { "value": "e12", "target": 2 }
                         ]
                     },
                     {
-                        "id": 2,
+                        "nodeNumber": 2,
                         "value": "n2",
                         "outEdges": [
                             { "value": "e20", "target": 0 }
@@ -274,9 +274,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph1.addNode(Foo("n0"))
         let n1 = graph1.addNode(Foo("n1"))
         let n2 = graph1.addNode(Foo("n2"))
-        try graph1.addEdge(n0.id, n1.id, Foo("e01"))
-        try graph1.addEdge(n1.id, n2.id, Foo("e12"))
-        try graph1.addEdge(n2.id, n0.id, Foo("e20"))
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -305,9 +305,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph1.addNode("n0")
         let n1 = graph1.addNode("n1")
         let n2 = graph1.addNode("n2")
-        try graph1.addEdge(n0.id, n1.id, Foo("e01"))
-        try graph1.addEdge(n1.id, n2.id, Foo("e12"))
-        try graph1.addEdge(n2.id, n0.id, Foo("e20"))
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -336,9 +336,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph1.addNode(Foo("n0"))
         let n1 = graph1.addNode(Foo("n1"))
         let n2 = graph1.addNode(Foo("n2"))
-        try graph1.addEdge(n0.id, n1.id, "e01")
-        try graph1.addEdge(n1.id, n2.id, "e12")
-        try graph1.addEdge(n2.id, n0.id, "e20")
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -367,9 +367,9 @@ final class CoderTests: XCTestCase {
         let n0 = graph1.addNode("n0")
         let n1 = graph1.addNode("n1")
         let n2 = graph1.addNode("n2")
-        try graph1.addEdge(n0.id, n1.id, "e01")
-        try graph1.addEdge(n1.id, n2.id, "e12")
-        try graph1.addEdge(n2.id, n0.id, "e20")
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())

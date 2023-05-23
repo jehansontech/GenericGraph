@@ -11,29 +11,31 @@ import Foundation
 // MARK:- Node
 // ====================================================
 
-
-public typealias NodeID = Int
-
-extension NodeID {
-    public static let noNode: NodeID = -1
-}
+// public typealias NodeID = Int
+//
+//extension NodeID {
+//    public static let noNode: NodeID = -1
+//}
 
 ///
 ///
 ///
-public protocol Node: AnyObject, Hashable where
-    InEdgeCollectionType.EdgeType == EdgeType,
-    OutEdgeCollectionType.EdgeType == EdgeType {
+public protocol Node: AnyObject, Hashable
+where InEdgeCollectionType.EdgeType == EdgeType,
+      OutEdgeCollectionType.EdgeType == EdgeType {
     
     associatedtype ValueType
     associatedtype EdgeType
     associatedtype InEdgeCollectionType: EdgeCollection
     associatedtype OutEdgeCollectionType: EdgeCollection
 
-    var id: NodeID { get }
+    /// Non-negative
+    /// Unique within the graph
+    /// Does not change
+    var nodeNumber: Int { get }
     
     var value: ValueType? { get set }
-        
+
     var outEdges: OutEdgeCollectionType { get }
     
     var inEdges: InEdgeCollectionType { get }
@@ -55,11 +57,11 @@ extension Node {
 
     /// equality is testable only within a given graph
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id
+        return lhs.nodeNumber == rhs.nodeNumber
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(nodeNumber)
     }
 }
 
@@ -72,11 +74,11 @@ public protocol NodeCollection: Sequence where Element == NodeType {
     
     var count: Int { get }
     
-    func contains(_ id: NodeID) -> Bool
- 
+    func contains(_ nodeNumber: Int) -> Bool
+
     func randomElement() -> NodeType?
-    
-    subscript(_ id: NodeID) -> NodeType? { get }
+
+    subscript(nodeNumber: Int) -> NodeType? { get }
 }
 
 
@@ -84,18 +86,17 @@ public protocol NodeCollection: Sequence where Element == NodeType {
 // MARK:- Edge
 // ====================================================
 
-
-public typealias EdgeID = Int
-
-
 ///
 ///
 ///
 public protocol Edge: AnyObject, Hashable {
     associatedtype ValueType
     associatedtype NodeType: Node
-    
-    var id: EdgeID { get }
+
+    /// Non-negative
+    /// Unique within the graph
+    /// Does not change
+    var edgeNumber: Int { get }
     
     var value: ValueType? { get set }
     
@@ -108,11 +109,11 @@ extension Edge {
 
     /// equality is testable only within a given graph
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id
+        return lhs.edgeNumber == rhs.edgeNumber
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(edgeNumber)
     }
 
     public var isSelfEdge: Bool {
@@ -128,11 +129,11 @@ public protocol EdgeCollection: Sequence where Element == EdgeType {
     
     var count: Int { get }
     
-    func contains(_ id: EdgeID) -> Bool
+    func contains(_ edgeNumber: Int) -> Bool
     
     func randomElement() -> EdgeType?
 
-    subscript(_ id: EdgeID) -> EdgeType? { get }
+    subscript(_ edgeNumber: Int) -> EdgeType? { get }
 }
 
 
@@ -144,9 +145,10 @@ public protocol EdgeCollection: Sequence where Element == EdgeType {
 public typealias GraphID = ObjectIdentifier
 
 public enum GraphError: Error {
-    case nodeExists(id: NodeID)
-    case noSuchNode(id: NodeID)
-    case noSuchEdge(id: EdgeID)
+    case nodeExists(nodeNumber: Int)
+    case noSuchNode(nodeNumber: Int)
+    case edgeExists(edgeNumber: Int)
+    case noSuchEdge(edgeNumber: Int)
 }
 
 
@@ -174,5 +176,5 @@ where EdgeType.NodeType == NodeType,
 
     var edges: EdgeCollectionType { get }
     
-    func subgraph(_ nodeIDs: Set<NodeID>) -> SubGraphType
+    func subgraph(_ nodeNumbers: Set<Int>) -> SubGraphType
 }
