@@ -95,19 +95,19 @@ final class CoderTests: XCTestCase {
                     {
                         "nodeNumber":0,
                         "outEdges": [
-                            { "target": 1 }
+                            { "edgeNumber": 0, "target": 1 }
                         ]
                     },
                     {
                         "nodeNumber": 1,
                         "outEdges": [
-                            { "target": 2 }
+                            { "edgeNumber": 1, "target": 2 }
                         ]
                     },
                     {
                         "nodeNumber": 2,
                         "outEdges": [
-                            { "target": 0 }
+                            { "edgeNumber": 2, "target": 0 }
                         ]
                     }
                 ]
@@ -140,21 +140,21 @@ final class CoderTests: XCTestCase {
                         "nodeNumber":0,
                         "value": "n0",
                         "outEdges": [
-                            { "target": 1 }
+                            { "edgeNumber": 0, "target": 1 }
                         ]
                     },
                     {
                         "nodeNumber": 1,
                         "value": "n1",
                         "outEdges": [
-                            { "target": 2 }
+                            { "edgeNumber": 1, "target": 2 }
                         ]
                     },
                     {
                         "nodeNumber": 2,
                         "value": "n2",
                         "outEdges": [
-                            { "target": 0 }
+                            { "edgeNumber": 2, "target": 0 }
                         ]
                     }
                 ]
@@ -186,19 +186,19 @@ final class CoderTests: XCTestCase {
                     {
                         "nodeNumber":0,
                         "outEdges": [
-                            { "value": "e01", "target": 1 }
+                            { "edgeNumber": 0, "value": "e01", "target": 1 }
                         ]
                     },
                     {
                         "nodeNumber": 1,
                         "outEdges": [
-                            { "value": "e12", "target": 2 }
+                            { "edgeNumber": 1, "value": "e12", "target": 2 }
                         ]
                     },
                     {
                         "nodeNumber": 2,
                         "outEdges": [
-                            { "value": "e20", "target": 0 }
+                            { "edgeNumber": 2, "value": "e20", "target": 0 }
                         ]
                     }
                 ]
@@ -231,21 +231,21 @@ final class CoderTests: XCTestCase {
                         "nodeNumber":0,
                         "value": "n0",
                         "outEdges": [
-                            { "value": "e01", "target": 1 }
+                            { "edgeNumber": 0, "value": "e01", "target": 1 }
                         ]
                     },
                     {
                         "nodeNumber": 1,
                         "value": "n1",
                         "outEdges": [
-                            { "value": "e12", "target": 2 }
+                            { "edgeNumber": 1, "value": "e12", "target": 2 }
                         ]
                     },
                     {
                         "nodeNumber": 2,
                         "value": "n2",
                         "outEdges": [
-                            { "value": "e20", "target": 0 }
+                            { "edgeNumber": 2, "value": "e20", "target": 0 }
                         ]
                     }
                 ]

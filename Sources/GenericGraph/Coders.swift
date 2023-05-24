@@ -10,12 +10,12 @@ import Foundation
 
 public enum GraphCodingKeys: String, CodingKey {
     case nodeNumber
+    case edgeNumber
     case value
     case target
     case nodes
     case outEdges
 }
-
 
 // ===================================================
 // MARK:- Encoding delegates
@@ -54,6 +54,7 @@ extension EncodingDelegate {
             var outEdgesContainer = nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
             for edge in node.outEdges {
                 var edgeContainer = outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+                try edgeContainer.encode(edge.edgeNumber, forKey: .edgeNumber)
                 try edgeContainer.encode(edge.target.nodeNumber, forKey: .target)
                 try encodeEdgeValue(edge.value, &edgeContainer)
             }
@@ -191,8 +192,20 @@ extension Graph where NodeType.ValueType: Encodable, EdgeType.ValueType: Encodab
 
 
 // ===================================================
-// MARK:- Decoding delegates
+// MARK:- Decoding helpers & delegates
 // ===================================================
+
+public struct GraphElementMapper {
+
+    /// key = old node number (e.g., decoded from file); value = new node number (e.g., added to graph)
+    public var newNodeNumbers = [Int: Int]()
+
+    /// key = old edge number (e.g., decoded from file); value = new edge number (e.g., added to graph)
+    public var newEdgeNumbers = [Int: Int]()
+
+    public init() {}
+}
+
 
 ///
 ///
@@ -204,7 +217,9 @@ public protocol GraphDecodingDelegate: Decodable {
     typealias EdgeType = BaseGraphEdge<NodeValueType, EdgeValueType>
 
     var graph: BaseGraph<NodeValueType, EdgeValueType> { get }
-    
+
+    var elementMapper: GraphElementMapper { get set }
+
     mutating func buildGraph(from decoder: Decoder) throws
 
     mutating func buildGraph(_ graphContainer: KeyedDecodingContainer<GraphCodingKeys>) throws
@@ -214,10 +229,6 @@ public protocol GraphDecodingDelegate: Decodable {
 
     /// edge is the edge into which the decoded value will be passed
     mutating func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> EdgeValueType?
-    
-    mutating func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int?
-        
-    mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int)
 }
 
 
@@ -242,21 +253,23 @@ extension GraphDecodingDelegate {
             var outEdgesContainer = try nodeContainer.nestedUnkeyedContainer(forKey: .outEdges)
             while !outEdgesContainer.isAtEnd {
                 var edgeContainer = try outEdgesContainer.nestedContainer(keyedBy: GraphCodingKeys.self)
+                let decodedEdgeNumber = try edgeContainer.decode(Int.self, forKey: .edgeNumber)
                 let decodedTargetNodeNumber = try edgeContainer.decode(Int.self, forKey: .target)
                 let targetNode = findOrCreateNode(decodedTargetNodeNumber)
                 let createdEdge = try graph.addEdge(createdNode.nodeNumber, targetNode.nodeNumber)
+                elementMapper.newEdgeNumbers[decodedEdgeNumber] = createdEdge.edgeNumber
                 createdEdge.value = try decodeEdgeValue(&edgeContainer, createdEdge)
             }
         }
     }
     
     public mutating func findOrCreateNode(_ decodedNodeNumber: Int) -> BaseGraph<NodeValueType, EdgeValueType>.NodeType {
-        if let createdNodeNumber = getCreatedNodeNumber(decodedNodeNumber) {
+        if let createdNodeNumber = elementMapper.newNodeNumbers[decodedNodeNumber] {
             return graph.nodes[createdNodeNumber]!
         }
         else {
             let createdNode = graph.addNode()
-            registerCreatedNodeNumber(decodedNodeNumber, createdNode.nodeNumber)
+            elementMapper.newNodeNumbers[decodedNodeNumber] = createdNode.nodeNumber
             return createdNode
         }
     }
@@ -273,8 +286,8 @@ public struct GraphDecoding_NoValues<N, E>: GraphDecodingDelegate {
     
     public var graph = BaseGraph<N, E>()
 
-    private var decodedToCreatedNodeNumbers = [Int: Int]()
-    
+    public var elementMapper = GraphElementMapper()
+
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
     }
@@ -285,14 +298,6 @@ public struct GraphDecoding_NoValues<N, E>: GraphDecodingDelegate {
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> E? {
         return nil
-    }
-    
-    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
-        return decodedToCreatedNodeNumbers[decodedNodeNumber]
-    }
-        
-    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
-        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -306,8 +311,8 @@ public struct GraphDecoding_NodeValues<N, E>: GraphDecodingDelegate where N: Dec
     
     public var graph = BaseGraph<N, E>()
     
-    private var decodedToCreatedNodeNumbers = [Int: Int]()
-    
+    public var elementMapper = GraphElementMapper()
+
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
     }
@@ -318,14 +323,6 @@ public struct GraphDecoding_NodeValues<N, E>: GraphDecodingDelegate where N: Dec
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> E? {
         return nil
-    }
-    
-    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
-        return decodedToCreatedNodeNumbers[decodedNodeNumber]
-    }
-        
-    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
-        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -339,8 +336,8 @@ public struct GraphDecoding_EdgeValues<N, E>: GraphDecodingDelegate where E: Dec
     
     public var graph = BaseGraph<N, E>()
     
-    private var decodedToCreatedNodeNumbers = [Int: Int]()
-    
+    public var elementMapper = GraphElementMapper()
+
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
     }
@@ -351,14 +348,6 @@ public struct GraphDecoding_EdgeValues<N, E>: GraphDecodingDelegate where E: Dec
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> E? {
         return try container.decodeIfPresent(E.self, forKey: .value)
-    }
-    
-    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
-        return decodedToCreatedNodeNumbers[decodedNodeNumber]
-    }
-        
-    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
-        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
@@ -371,9 +360,9 @@ public struct GraphDecoding_AllValues<N, E>: GraphDecodingDelegate where N: Deco
     public typealias EdgeValueType = E
     
     public var graph = BaseGraph<N, E>()
-    
-    private var decodedToCreatedNodeNumbers = [Int: Int]()
-    
+
+    public var elementMapper = GraphElementMapper()
+
     public init(from decoder: Decoder) throws {
         try buildGraph(from: decoder)
     }
@@ -384,14 +373,6 @@ public struct GraphDecoding_AllValues<N, E>: GraphDecodingDelegate where N: Deco
     
     public func decodeEdgeValue(_ container: inout KeyedDecodingContainer<GraphCodingKeys>, _ edge: EdgeType) throws -> E? {
         return try container.decodeIfPresent(E.self, forKey: .value)
-    }
-    
-    public func getCreatedNodeNumber(_ decodedNodeNumber: Int) -> Int? {
-        return decodedToCreatedNodeNumbers[decodedNodeNumber]
-    }
-        
-    public mutating func registerCreatedNodeNumber(_ decodedNodeNumber: Int, _ createdNodeNumber: Int) {
-        decodedToCreatedNodeNumbers[decodedNodeNumber] = createdNodeNumber
     }
 }
 
