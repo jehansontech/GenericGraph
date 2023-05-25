@@ -33,47 +33,47 @@ public enum Direction: String, CaseIterable, Codable, Sendable {
 public class Step<EdgeType: Edge>: Hashable, Equatable {
     
     public var edgeNumber: Int {
-        return _edge.edgeNumber
+        return edge.edgeNumber
     }
     
     public var edgeValue: EdgeType.ValueType? {
         get {
-            return _edge.value
+            return edge.value
         }
         set(newValue) {
-            _edge.value = newValue
+            edge.value = newValue
         }
     }
     
     public var origin: EdgeType.NodeType {
         switch direction {
         case .forward:
-            return _edge.source
+            return edge.source
         case .backward:
-            return _edge.target
+            return edge.target
         }
     }
     
     public var destination: EdgeType.NodeType {
         switch direction {
         case .forward:
-            return _edge.target
+            return edge.target
         case .backward:
-            return _edge.source
+            return edge.source
         }
     }
     
     public let direction: Direction
 
-    internal let _edge: EdgeType
+    public let edge: EdgeType
     
     public init(_ edge: EdgeType, _ direction: Direction) {
-        self._edge = edge
+        self.edge = edge
         self.direction = direction
     }
 
     public func reverse() -> Step<EdgeType> {
-        return Step(self._edge, Direction.reverse(self.direction))
+        return Step(self.edge, Direction.reverse(self.direction))
     }
 
     public func hash(into hasher: inout Hasher) {
