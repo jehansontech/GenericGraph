@@ -45,8 +45,6 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
         }
     }
     
-    public let direction: Direction
-    
     public var origin: EdgeType.NodeType {
         switch direction {
         case .forward:
@@ -65,6 +63,8 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
         }
     }
     
+    public let direction: Direction
+
     internal let _edge: EdgeType
     
     public init(_ edge: EdgeType, _ direction: Direction) {
