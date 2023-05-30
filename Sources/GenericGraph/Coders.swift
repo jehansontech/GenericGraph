@@ -205,6 +205,15 @@ public struct GraphElementMapper {
 
     public init() {}
 
+    public func newEdgeNumber(for oldEdgeNumber: Int) throws -> Int {
+        if let newNumber = newEdgeNumbers[oldEdgeNumber] {
+            return newNumber
+        }
+        else {
+            throw GraphElementMapperError.edgeNotInMapper(edgeNumber: oldEdgeNumber)
+        }
+    }
+
     public func findEdge<G: Graph>(in newGraph: G, for oldEdgeNumber: Int) throws -> G.EdgeType {
         guard
             let newEdgeNumber = self.newEdgeNumbers[oldEdgeNumber]
@@ -219,6 +228,16 @@ public struct GraphElementMapper {
         }
 
         return edge
+    }
+
+    public func newNodeNumber(for oldNodeNumber: Int) throws -> Int {
+        if let newNumber = newNodeNumbers[oldNodeNumber] {
+            return newNumber
+        }
+        else {
+            throw GraphElementMapperError.nodeNotInMapper(nodeNumber: oldNodeNumber)
+
+        }
     }
 
     public func findNode<G: Graph>(in newGraph: G, for oldNodeNumber: Int) throws -> G.NodeType {
@@ -237,6 +256,11 @@ public struct GraphElementMapper {
         return node
     }
 
+}
+
+public protocol GraphElementDependent {
+
+    mutating func replaceGraphElements(_ mapper: GraphElementMapper) throws
 }
 
 public enum GraphElementMapperError: Error {
