@@ -225,7 +225,11 @@ public class BaseGraph<N, E>: Graph {
     internal var _nextEdgeNumber: Int = 0
             
     public init() {}
-        
+
+    public func subgraph() -> SubGraph<N, E> {
+        return SubGraph<N, E>(self)
+    }
+
     public func subgraph<S: Sequence>(_ nodeNumbers: S) -> SubGraph<N, E> where S.Element == Int {
         return SubGraph<N, E>(self, nodeNumbers)
     }

@@ -506,7 +506,9 @@ public class SubGraph<N, E>: Graph {
     public func subgraph(_ nodeNumbers: Set<Int>) -> SubGraph<N, E> {
         return SubGraph<N, E>(self, nodeNumbers)
     }
-    
+
+    /// Throws error if the node number is not in the base graph
+    ///
     @discardableResult public func addNode(nodeNumber: Int) throws -> SubGraphNode<N, E> {
         if let baseNode = baseGraph.nodes[nodeNumber] {
             _nodeNumbers.insert(nodeNumber)
@@ -516,8 +518,19 @@ public class SubGraph<N, E>: Graph {
             throw GraphError.noSuchNode(nodeNumber: nodeNumber)
         }
     }
-    
+
+    /// ASSUMES the node number is in the base graph
+    ///
+    @discardableResult public func uncheckedAddNode(nodeNumber: Int) -> SubGraphNode<N, E> {
+        _nodeNumbers.insert(nodeNumber)
+        return SubGraphNode<N, E>(self, baseGraph.nodes[nodeNumber]!)
+    }
+
     public func removeNode(nodeNumber: Int) {
         _nodeNumbers.remove(nodeNumber)
+    }
+
+    public func removeAll() {
+        _nodeNumbers.removeAll()
     }
 }
