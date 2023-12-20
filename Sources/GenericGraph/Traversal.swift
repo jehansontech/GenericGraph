@@ -81,7 +81,7 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
         hasher.combine(direction)
     }
 
-    public static func ==<EdgeType: Edge>(lhs: Step<EdgeType>, rhs: Step<EdgeType>) -> Bool {
+    public static func ==<E: Edge>(lhs: Step<E>, rhs: Step<E>) -> Bool {
         return lhs.edgeNumber == rhs.edgeNumber && lhs.direction == rhs.direction
     }
 }
