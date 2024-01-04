@@ -192,7 +192,7 @@ extension Graph where NodeType.ValueType: Encodable, EdgeType.ValueType: Encodab
 
 
 // ===================================================
-// MARK:- Decoding helpers & delegates
+// MARK: - Decoding helpers & delegates
 // ===================================================
 
 public struct GraphElementMapper {
