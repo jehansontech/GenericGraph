@@ -21,6 +21,13 @@ extension Node where ValueType: EmbeddedNodeValue {
     }
 }
 
+extension Step where EdgeType.NodeType.ValueType: EmbeddedNodeValue {
+
+    var displacement: SIMD3<Float> {
+        destination.location - origin.location
+    }
+}
+
 extension Graph where NodeType.ValueType: EmbeddedNodeValue {
 
     public func makeBoundingBox() -> BoundingBox {
