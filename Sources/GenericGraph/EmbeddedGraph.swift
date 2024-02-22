@@ -45,3 +45,7 @@ extension Graph where NodeType.ValueType: EmbeddedNodeValue {
         return bbox ?? BoundingBox(SIMD3<Float>(0,0,0))
     }
 }
+
+public enum EmbeddedGraphError: Error {
+    case noNodeAtLocation(location: SIMD3<Float>)
+}
