@@ -86,12 +86,17 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
     }
 }
 
-public struct StepSpec: Codable, Sendable {
+public struct StepSpec: Codable, Sendable, Equatable, Hashable {
 
     public var edgeNumber: Int
 
     public var direction: Direction
 
+    public init(_ edgeNumber: Int, _ direction: Direction) {
+        self.edgeNumber = edgeNumber
+        self.direction = direction
+    }
+    
     public init<EdgeType: Edge>(_ step: Step<EdgeType>) {
         self.edgeNumber = step.edgeNumber
         self.direction = step.direction
