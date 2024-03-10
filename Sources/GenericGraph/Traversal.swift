@@ -6,12 +6,10 @@ import Foundation
 
 
 // ====================================================
-// MARK:- Step
+// MARK: - Step
 // ====================================================
 
-///
-///
-///
+
 public enum Direction: String, CaseIterable, Codable, Sendable {
     case forward
     case backward
@@ -27,9 +25,6 @@ public enum Direction: String, CaseIterable, Codable, Sendable {
 }
 
 
-///
-///
-///
 public class Step<EdgeType: Edge>: Hashable, Equatable {
     
     public var edgeNumber: Int {
@@ -86,7 +81,8 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
     }
 }
 
-public struct StepSpec: Codable, Sendable, Equatable, Hashable {
+
+public struct StepIdentifier: Codable, Sendable, Equatable, Hashable {
 
     public var edgeNumber: Int
 
@@ -103,9 +99,7 @@ public struct StepSpec: Codable, Sendable, Equatable, Hashable {
     }
 }
 
-///
-///
-///
+
 public struct StepCollection<EdgeType: Edge>: Sequence {
     public typealias Element = Step<EdgeType>
     public typealias Iterator = StepIterator<EdgeType>
@@ -236,9 +230,6 @@ public struct StepCollection<EdgeType: Edge>: Sequence {
 }
 
 
-///
-///
-///
 public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
     public typealias Element = Step<EdgeType>
 
@@ -271,7 +262,7 @@ public struct StepIterator<EdgeType: Edge>: IteratorProtocol {
 
 
 // ====================================================
-// MARK:- Path
+// MARK: - Path
 // ====================================================
 
 
@@ -343,7 +334,7 @@ public struct Path<EdgeType: Edge> {
 
 
 // ====================================================
-// MARK:- Neighborhood
+// MARK: - Neighborhood
 // ====================================================
 
 
@@ -461,7 +452,7 @@ public struct NeighborhoodTraverser<NodeType: Node>: IteratorProtocol {
 }
 
 // ========================================
-// MARK:- Node extensions
+// MARK: - Node extensions
 // ========================================
 
 ///
@@ -491,7 +482,7 @@ extension Node {
 
 
 // ========================================
-// MARK:- Graph extensions
+// MARK: - Graph extensions
 // ========================================
 
 ///
