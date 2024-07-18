@@ -9,26 +9,26 @@ import Foundation
 import simd
 import Wacoma
 
-public protocol EmbeddedNodeValue {
+public protocol EmbeddedValue {
 
     var location: SIMD3<Float> { get set }
 }
 
-extension Node where ValueType: EmbeddedNodeValue {
+extension Node where ValueType: EmbeddedValue {
 
     var location: SIMD3<Float> {
         value?.location ?? .zero
     }
 }
 
-extension Step where EdgeType.NodeType.ValueType: EmbeddedNodeValue {
+extension Step where EdgeType.NodeType.ValueType: EmbeddedValue {
 
     var displacement: SIMD3<Float> {
         destination.location - origin.location
     }
 }
 
-extension Graph where NodeType.ValueType: EmbeddedNodeValue {
+extension Graph where NodeType.ValueType: EmbeddedValue {
 
     public func makeBoundingBox() -> BoundingBox {
         var bbox: BoundingBox? = nil
