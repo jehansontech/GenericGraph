@@ -72,8 +72,18 @@ public struct SubGraphNodeCollection<N, E>: NodeCollection {
         return _graph._nodeNumbers.count
     }
         
+    public var first: NodeType? {
+        if let firstNodeNumber = _graph._nodeNumbers.first,
+           let baseNode = _graph.baseGraph.nodes[firstNodeNumber] {
+            return SubGraphNode<N, E>(_graph, baseNode)
+        }
+        else {
+            return nil
+        }
+    }
+
     internal weak var _graph: SubGraph<N, E>!
-    
+
     public init(_ graph: SubGraph<N, E>) {
         self._graph = graph
     }
@@ -198,7 +208,19 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
     public var count: Int {
         return _baseNode._inEdges.edgesByEdgeNumber.filter({ _graph.nodes.contains($0.value._source.nodeNumber) }).count
     }
-            
+
+    /// INEFFICIENT
+    public var first: SubGraphEdge<N, E>? {
+        if let baseEdge = _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._source.nodeNumber)
+        }).first?.value {
+            return SubGraphEdge<N,E>(_graph, baseEdge)
+        }
+        else {
+            return nil
+        }
+    }
+
     internal weak var _graph: SubGraph<N, E>!
     
     internal let _baseNode: BaseGraphNode<N, E>
@@ -219,7 +241,9 @@ public struct SubGraphInEdgeCollection<N, E>: EdgeCollection {
     
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
-        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._source.nodeNumber) }).randomElement()?.value {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._source.nodeNumber)
+        }).randomElement()?.value {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -286,6 +310,18 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
         return _baseNode._outEdges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._target.nodeNumber) }).count
     }
             
+    /// INEFFICIENT
+    public var first: SubGraphEdge<N, E>? {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._target.nodeNumber)
+        }).first?.value {
+            return SubGraphEdge<N,E>(_graph, baseEdge)
+        }
+        else {
+            return nil
+        }
+    }
+
     internal weak var _graph: SubGraph<N, E>!
     
     internal let _baseNode: BaseGraphNode<N, E>
@@ -303,10 +339,12 @@ public struct SubGraphOutEdgeCollection<N, E>: EdgeCollection {
             return false
         }
     }
-    
+
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
-        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({ _graph._nodeNumbers.contains($0.value._target.nodeNumber) }).randomElement()?.value {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._target.nodeNumber)
+        }).randomElement()?.value {
             return SubGraphEdge<N,E>(_graph, baseEdge)
         }
         else {
@@ -374,7 +412,19 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
             _graph._nodeNumbers.contains($0.value._source.nodeNumber) && _graph._nodeNumbers.contains($0.value._target.nodeNumber)
         }).count
     }
-            
+
+    /// INEFFICIENT
+    public var first: SubGraphEdge<N, E>? {
+        if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({
+            _graph._nodeNumbers.contains($0.value._source.nodeNumber) && _graph._nodeNumbers.contains($0.value._target.nodeNumber)
+        }).first?.value {
+            return SubGraphEdge<N,E>(_graph, baseEdge)
+        }
+        else {
+            return nil
+        }
+    }
+
     internal weak var _graph: SubGraph<N, E>!
         
     public init(_ graph: SubGraph<N, E>) {
@@ -389,7 +439,7 @@ public struct SubGraphEdgeCollection<N, E>: EdgeCollection {
             return false
         }
     }
-    
+
     /// INEFFICIENT
     public func randomElement() -> SubGraphEdge<N, E>? {
         if let baseEdge =  _graph.baseGraph._edges.edgesByEdgeNumber.filter({

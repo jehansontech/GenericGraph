@@ -64,6 +64,10 @@ public struct BaseGraphNodeCollection<N, E>: NodeCollection {
         return nodesByNodeNumber.count
     }
     
+    public var first: BaseGraphNode<N, E>? {
+        return nodesByNodeNumber.first?.value
+    }
+
     internal var nodesByNodeNumber = Dictionary<Int, BaseGraphNode<N, E>>()
     
     public func contains(_ nodeNumber: Int) -> Bool {
@@ -154,6 +158,10 @@ public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
         return edgesByEdgeNumber.count
     }
     
+    public var first: BaseGraphEdge<N, E>? {
+        return edgesByEdgeNumber.first?.value
+    }
+
     internal var edgesByEdgeNumber =  Dictionary<Int, BaseGraphEdge<N, E>>()
     
     public func contains(_ edgeNumber: Int) -> Bool {

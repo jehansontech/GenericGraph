@@ -68,6 +68,8 @@ public protocol NodeCollection: Sequence where Element == NodeType {
     
     var count: Int { get }
     
+    var first: NodeType? { get }
+
     func contains(_ nodeNumber: Int) -> Bool
 
     func randomElement() -> NodeType?
@@ -122,6 +124,8 @@ public protocol EdgeCollection: Sequence where Element == EdgeType {
     associatedtype EdgeType: Edge
     
     var count: Int { get }
+    
+    var first: EdgeType? { get }
     
     func contains(_ edgeNumber: Int) -> Bool
     
