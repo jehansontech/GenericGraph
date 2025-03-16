@@ -16,14 +16,14 @@ public protocol EmbeddedValue {
 
 extension Node where ValueType: EmbeddedValue {
 
-    var location: SIMD3<Float> {
+    public var location: SIMD3<Float> {
         value?.location ?? .zero
     }
 }
 
 extension Step where EdgeType.NodeType.ValueType: EmbeddedValue {
 
-    var displacement: SIMD3<Float> {
+    public var displacement: SIMD3<Float> {
         destination.location - origin.location
     }
 }
