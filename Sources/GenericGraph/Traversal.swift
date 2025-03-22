@@ -14,7 +14,16 @@ public enum Direction: String, CaseIterable, Codable, Sendable {
     case forward
     case backward
 
-    public static func reverse(_ dir: Direction) -> Direction {
+    public var reverse: Direction {
+        switch self {
+        case .forward:
+            return .backward
+        case .backward:
+            return .forward
+        }
+    }
+
+    public static func reverseOf(_ dir: Direction) -> Direction {
         switch dir {
         case .forward:
             return .backward
@@ -67,8 +76,8 @@ public class Step<EdgeType: Edge>: Hashable, Equatable {
         self.direction = direction
     }
 
-    public func reverse() -> Step<EdgeType> {
-        return Step(self.edge, Direction.reverse(self.direction))
+    public func reversed() -> Step<EdgeType> {
+        return Step(self.edge, self.direction.reverse)
     }
 
     public func hash(into hasher: inout Hasher) {
