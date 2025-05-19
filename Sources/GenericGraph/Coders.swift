@@ -195,7 +195,7 @@ extension Graph where NodeType.ValueType: Encodable, EdgeType.ValueType: Encodab
 // MARK: - Decoding helpers & delegates
 // ===================================================
 
-public struct GraphElementMapper {
+public struct GraphElementMapper: Sendable {
 
     /// key = old node number (e.g., decoded from file); value = new node number (e.g., added to graph)
     public var newNodeNumbers = [Int: Int]()
