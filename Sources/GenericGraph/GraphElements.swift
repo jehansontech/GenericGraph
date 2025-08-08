@@ -49,11 +49,26 @@ extension Node {
         return inEdges.count + outEdges.count
     }
 
+    public func hasEdge(to nodeNumber: Int) -> Bool {
+        for outEdge in outEdges {
+            if outEdge.target.nodeNumber == nodeNumber {
+                return true
+            }
+        }
+        for inEdge in inEdges {
+            if inEdge.source.nodeNumber == nodeNumber {
+                return true
+            }
+        }
+        return false
+    }
+
     /// equality is testable only within a given graph
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.nodeNumber == rhs.nodeNumber
     }
 
+    /// hashing is valid only within a given graph
     public func hash(into hasher: inout Hasher) {
         hasher.combine(nodeNumber)
     }

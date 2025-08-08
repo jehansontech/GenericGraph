@@ -291,7 +291,7 @@ public class BaseGraph<N, E>: Graph {
         else {
             throw GraphError.noSuchNode(nodeNumber: to)
         }
-        
+
         return uncheckedAddEdge(source, target, value)
     }
 
