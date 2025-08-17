@@ -8,12 +8,9 @@
 import Foundation
 
 // ====================================================
-// MARK:- BaseGraph node
+// MARK: - BaseGraphNode
 // ====================================================
 
-///
-///
-///
 public class BaseGraphNode<N, E>: Node {
     public typealias ValueType = N
     public typealias EdgeType = BaseGraphEdge<N, E>
@@ -47,10 +44,6 @@ public class BaseGraphNode<N, E>: Node {
     }
 }
 
-
-///
-///
-///
 public struct BaseGraphNodeCollection<N, E>: NodeCollection {
 
     public typealias NodeType = BaseGraphNode<N, E>
@@ -87,10 +80,6 @@ public struct BaseGraphNodeCollection<N, E>: NodeCollection {
     }
 }
 
-
-///
-///
-///
 public struct BaseGraphNodeIterator<N, E>: IteratorProtocol {
     public typealias Element = BaseGraphNode<N, E>
 
@@ -107,13 +96,9 @@ public struct BaseGraphNodeIterator<N, E>: IteratorProtocol {
 
 
 // ====================================================
-// MARK:- BaseGraph edge
+// MARK: - BaseGraphEdge
 // ====================================================
 
-
-///
-///
-///
 public class BaseGraphEdge<N, E>: Edge {
     public typealias ValueType = E
     public typealias NodeType = BaseGraphNode<N, E>
@@ -142,10 +127,6 @@ public class BaseGraphEdge<N, E>: Edge {
     }
 }
 
-
-///
-///
-///
 public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
     public typealias EdgeType = BaseGraphEdge<N, E>
     public typealias Iterator = BaseGraphEdgeIterator<N, E>
@@ -181,10 +162,6 @@ public struct BaseGraphEdgeCollection<N, E>: EdgeCollection {
     }
 }
 
-
-///
-///
-///
 public struct BaseGraphEdgeIterator<N, E>: IteratorProtocol {
     public typealias Element = BaseGraphEdge<N, E>
     
@@ -200,13 +177,9 @@ public struct BaseGraphEdgeIterator<N, E>: IteratorProtocol {
 }
 
 // ====================================================
-// MARK:- BaseGraph
+// MARK: - BaseGraph
 // ====================================================
 
-
-///
-///
-///
 public class BaseGraph<N, E>: Graph {
     public typealias NodeType = BaseGraphNode<N, E>
     public typealias EdgeType = BaseGraphEdge<N, E>
@@ -255,7 +228,8 @@ public class BaseGraph<N, E>: Graph {
     //        return newNode
     //    }
 
-    @discardableResult public func addNode(_ value: N? = nil) -> BaseGraphNode<N, E> {
+    @discardableResult
+    public func addNode(_ value: N? = nil) -> BaseGraphNode<N, E> {
         let newNodeNumber = _nextNodeNumber
         _nextNodeNumber += 1
         
@@ -279,7 +253,8 @@ public class BaseGraph<N, E>: Graph {
         nodeNumbers.forEach({ removeNode($0) })
     }
 
-    @discardableResult public func addEdge(_ from: Int, _ to: Int, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
+    @discardableResult
+    public func addEdge(_ from: Int, _ to: Int, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
             let source = _nodes[from]
         else {
@@ -295,7 +270,8 @@ public class BaseGraph<N, E>: Graph {
         return uncheckedAddEdge(source, target, value)
     }
 
-    @discardableResult public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E? = nil) -> BaseGraphEdge<N, E> {
+    @discardableResult
+    public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E? = nil) -> BaseGraphEdge<N, E> {
         let newEdgeNumber = _nextEdgeNumber
         _nextEdgeNumber += 1
 
@@ -321,6 +297,4 @@ public class BaseGraph<N, E>: Graph {
         _edges.edgesByEdgeNumber.removeAll()
         _nodes.nodesByNodeNumber.removeAll()
     }
-
 }
-
