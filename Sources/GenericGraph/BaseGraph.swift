@@ -253,6 +253,11 @@ public class BaseGraph<N, E>: Graph {
         nodeNumbers.forEach({ removeNode($0) })
     }
 
+    public func removeAllNodes() {
+        _edges.edgesByEdgeNumber.removeAll()
+        _nodes.nodesByNodeNumber.removeAll()
+    }
+
     @discardableResult
     public func addEdge(_ from: Int, _ to: Int, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
@@ -293,8 +298,10 @@ public class BaseGraph<N, E>: Graph {
         edgeNumbers.forEach({ removeEdge($0) })
     }
 
-    public func clearAll() {
-        _edges.edgesByEdgeNumber.removeAll()
-        _nodes.nodesByNodeNumber.removeAll()
+    public func reset() {
+        _nodes.nodesByNodeNumber = .init()
+        _nextNodeNumber = 0
+        _edges.edgesByEdgeNumber = .init()
+        _nextEdgeNumber = 0
     }
 }
