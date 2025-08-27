@@ -237,8 +237,9 @@ public class BaseGraph<N, E>: Graph {
         _nodes.nodesByNodeNumber[newNodeNumber] = newNode
         return newNode
     }
-    
-    public func removeNode(_ nodeNumber: Int) {
+
+    @discardableResult
+    public func removeNode(_ nodeNumber: Int) -> N? {
         if let node = _nodes.nodesByNodeNumber.removeValue(forKey: nodeNumber) {
             for edge in node._inEdges {
                 removeEdge(edge.edgeNumber)
@@ -246,6 +247,10 @@ public class BaseGraph<N, E>: Graph {
             for edge in node._outEdges {
                 removeEdge(edge.edgeNumber)
             }
+            return node.value
+        }
+        else {
+            return nil
         }
     }
 
@@ -287,10 +292,15 @@ public class BaseGraph<N, E>: Graph {
         return newEdge
     }
 
-    public func removeEdge(_ edgeNumber: Int) {
+    @discardableResult
+    public func removeEdge(_ edgeNumber: Int) -> E? {
         if let edge = _edges.edgesByEdgeNumber.removeValue(forKey: edgeNumber) {
             edge._source._outEdges.edgesByEdgeNumber.removeValue(forKey: edgeNumber)
             edge._target._inEdges.edgesByEdgeNumber.removeValue(forKey: edgeNumber)
+            return edge.value
+        }
+        else {
+            return nil
         }
     }
 
