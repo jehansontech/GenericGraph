@@ -292,6 +292,7 @@ public class BaseGraph<N, E>: Graph {
         return newEdge
     }
 
+    /// If edge was removed, returns its value (which may be nil). If not, returns nil.
     @discardableResult
     public func removeEdge(_ edgeNumber: Int) -> E? {
         if let edge = _edges.edgesByEdgeNumber.removeValue(forKey: edgeNumber) {
