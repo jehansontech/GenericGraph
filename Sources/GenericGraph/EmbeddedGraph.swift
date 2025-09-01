@@ -21,6 +21,17 @@ extension Node where ValueType: EmbeddedValue {
     }
 }
 
+extension Edge where NodeType.ValueType: EmbeddedValue {
+
+    public var length: Float {
+        distance(source.location, target.location)
+    }
+
+    public var displacement: SIMD3<Float> {
+        target.location - source.location
+    }
+}
+
 extension Step where EdgeType.NodeType.ValueType: EmbeddedValue {
 
     public var displacement: SIMD3<Float> {
