@@ -215,24 +215,9 @@ public class BaseGraph<N, E>: Graph {
         return SubGraph<N, E>(self, nodeNumbers)
     }
 
-    // TODO: determine whether this is safe
-    //    @discardableResult public func addNode(_ nodeNumber: Int, _ value: N? = nil) throws -> BaseGraphNode<N, E> {
-    //        if _nodes._dict[nodeNumber] != nil {
-    //            throw GraphError.nodeExists(nodeNumber: nodeNumber)
-    //        }
-    //
-    //        _nextNodeNumber = max(nodeNumber, _nextNodeNumber) + 1
-    //
-    //        let newNode = BaseGraphNode<N, E>(nodeNumber, value)
-    //        _nodes._dict[nodeNumber] = newNode
-    //        return newNode
-    //    }
-
     @discardableResult
-    public func addNode(_ value: N? = nil) -> BaseGraphNode<N, E> {
-        let newNodeNumber = _nextNodeNumber
-        _nextNodeNumber += 1
-        
+    public func addNode(preferredNodeNumber: Int? = nil, value: N? = nil) -> BaseGraphNode<N, E> {
+        let newNodeNumber = chooseNodeNumber(preference: preferredNodeNumber)
         let newNode = BaseGraphNode<N, E>(newNodeNumber, value)
         _nodes.nodesByNodeNumber[newNodeNumber] = newNode
         return newNode
@@ -264,7 +249,7 @@ public class BaseGraph<N, E>: Graph {
     }
 
     @discardableResult
-    public func addEdge(_ from: Int, _ to: Int, _ value: E? = nil) throws -> BaseGraphEdge<N, E> {
+    public func addEdge(_ from: Int, _ to: Int, preferredEdgeNumber: Int? = nil, value: E? = nil) throws -> BaseGraphEdge<N, E> {
         guard
             let source = _nodes[from]
         else {
@@ -277,14 +262,12 @@ public class BaseGraph<N, E>: Graph {
             throw GraphError.noSuchNode(nodeNumber: to)
         }
 
-        return uncheckedAddEdge(source, target, value)
+        return uncheckedAddEdge(source, target, preferredEdgeNumber: preferredEdgeNumber, value: value)
     }
 
     @discardableResult
-    public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, _ value: E? = nil) -> BaseGraphEdge<N, E> {
-        let newEdgeNumber = _nextEdgeNumber
-        _nextEdgeNumber += 1
-
+    public func uncheckedAddEdge(_ source: BaseGraphNode<N, E>, _ target: BaseGraphNode<N, E>, preferredEdgeNumber: Int? = nil, value: E? = nil) -> BaseGraphEdge<N, E> {
+        let newEdgeNumber = chooseEdgeNumber(preference: preferredEdgeNumber)
         let newEdge = BaseGraphEdge<N, E>(newEdgeNumber, value, source, target)
         _edges.edgesByEdgeNumber[newEdgeNumber] = newEdge
         source._outEdges.edgesByEdgeNumber[newEdgeNumber] = newEdge
@@ -315,4 +298,33 @@ public class BaseGraph<N, E>: Graph {
         _edges.edgesByEdgeNumber = .init()
         _nextEdgeNumber = 0
     }
+
+    private func chooseNodeNumber(preference: Int?) -> Int {
+        let newNodeNumber: Int
+        if let preference, _nodes.nodesByNodeNumber[preference] == nil {
+            newNodeNumber = preference
+        }
+        else {
+            newNodeNumber = _nextNodeNumber
+        }
+        if newNodeNumber >= _nextNodeNumber {
+            _nextNodeNumber = newNodeNumber + 1
+        }
+        return newNodeNumber
+    }
+
+    private func chooseEdgeNumber(preference: Int?) -> Int {
+        let newEdgeNumber: Int
+        if let preference, _edges.edgesByEdgeNumber[preference] == nil {
+            newEdgeNumber = preference
+        }
+        else {
+            newEdgeNumber = _nextEdgeNumber
+        }
+        if newEdgeNumber >= _nextEdgeNumber {
+            _nextEdgeNumber = newEdgeNumber + 1
+        }
+        return newEdgeNumber
+    }
+
 }

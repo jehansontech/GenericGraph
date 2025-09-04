@@ -25,12 +25,12 @@ final class CoderTests: XCTestCase {
 
     func test_encodeWithNoValues() throws {
         let graph = BaseGraph<Foo, Foo>()
-        let n0 = graph.addNode(Foo("n0"))
-        let n1 = graph.addNode(Foo("n1"))
-        let n2 = graph.addNode(Foo("n2"))
-        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
-        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
-        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
+        let n0 = graph.addNode(value: Foo("n0"))
+        let n1 = graph.addNode(value: Foo("n1"))
+        let n2 = graph.addNode(value: Foo("n2"))
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, value: Foo("e01"))
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, value: Foo("e12"))
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, value: Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -41,13 +41,13 @@ final class CoderTests: XCTestCase {
 
     func test_encodeWithNodeValues() throws {
         let graph = BaseGraph<String, Foo>()
-        let n0 = graph.addNode("n0")
-        let n1 = graph.addNode("n1")
-        let n2 = graph.addNode("n2")
-        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
-        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
-        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
-        
+        let n0 = graph.addNode(value: "n0")
+        let n1 = graph.addNode(value: "n1")
+        let n2 = graph.addNode(value: "n2")
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, value: Foo("e01"))
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, value: Foo("e12"))
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, value: Foo("e20"))
+
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
@@ -57,13 +57,13 @@ final class CoderTests: XCTestCase {
     
     func test_encodeWithEdgeValues() throws {
         let graph = BaseGraph<Foo, String>()
-        let n0 = graph.addNode(Foo("n0"))
-        let n1 = graph.addNode(Foo("n1"))
-        let n2 = graph.addNode(Foo("n2"))
-        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
-        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
-        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
-        
+        let n0 = graph.addNode(value: Foo("n0"))
+        let n1 = graph.addNode(value: Foo("n1"))
+        let n2 = graph.addNode(value: Foo("n2"))
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, value: "e01")
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, value: "e12")
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, value: "e20")
+
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
         let json = String(data: data, encoding: .utf8)!
@@ -73,12 +73,12 @@ final class CoderTests: XCTestCase {
     
     func test_encodeWithBothValues() throws {
         let graph = BaseGraph<String, String>()
-        let n0 = graph.addNode("n0")
-        let n1 = graph.addNode("n1")
-        let n2 = graph.addNode("n2")
-        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
-        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
-        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
+        let n0 = graph.addNode(value: "n0")
+        let n1 = graph.addNode(value: "n1")
+        let n2 = graph.addNode(value: "n2")
+        try graph.addEdge(n0.nodeNumber, n1.nodeNumber, value: "e01")
+        try graph.addEdge(n1.nodeNumber, n2.nodeNumber, value: "e12")
+        try graph.addEdge(n2.nodeNumber, n0.nodeNumber, value: "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph.makeEncodingDelegate())
@@ -271,12 +271,12 @@ final class CoderTests: XCTestCase {
 
     func test_roundTripWithNoValues() throws {
         let graph1 = BaseGraph<Foo, Foo>()
-        let n0 = graph1.addNode(Foo("n0"))
-        let n1 = graph1.addNode(Foo("n1"))
-        let n2 = graph1.addNode(Foo("n2"))
-        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
-        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
-        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
+        let n0 = graph1.addNode(value: Foo("n0"))
+        let n1 = graph1.addNode(value: Foo("n1"))
+        let n2 = graph1.addNode(value: Foo("n2"))
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, value: Foo("e01"))
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, value: Foo("e12"))
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, value: Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -302,12 +302,12 @@ final class CoderTests: XCTestCase {
 
     func test_roundTripWithNodeValues() throws {
         let graph1 = BaseGraph<String, Foo>()
-        let n0 = graph1.addNode("n0")
-        let n1 = graph1.addNode("n1")
-        let n2 = graph1.addNode("n2")
-        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, Foo("e01"))
-        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, Foo("e12"))
-        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, Foo("e20"))
+        let n0 = graph1.addNode(value: "n0")
+        let n1 = graph1.addNode(value: "n1")
+        let n2 = graph1.addNode(value: "n2")
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, value: Foo("e01"))
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, value: Foo("e12"))
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, value: Foo("e20"))
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -333,12 +333,12 @@ final class CoderTests: XCTestCase {
 
     func test_roundTripWithEdgeValues() throws {
         let graph1 = BaseGraph<Foo, String>()
-        let n0 = graph1.addNode(Foo("n0"))
-        let n1 = graph1.addNode(Foo("n1"))
-        let n2 = graph1.addNode(Foo("n2"))
-        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
-        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
-        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
+        let n0 = graph1.addNode(value: Foo("n0"))
+        let n1 = graph1.addNode(value: Foo("n1"))
+        let n2 = graph1.addNode(value: Foo("n2"))
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, value: "e01")
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, value: "e12")
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, value: "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())
@@ -364,12 +364,12 @@ final class CoderTests: XCTestCase {
 
     func test_roundTripWithBothValues() throws {
         let graph1 = BaseGraph<String, String>()
-        let n0 = graph1.addNode("n0")
-        let n1 = graph1.addNode("n1")
-        let n2 = graph1.addNode("n2")
-        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, "e01")
-        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, "e12")
-        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, "e20")
+        let n0 = graph1.addNode(value: "n0")
+        let n1 = graph1.addNode(value: "n1")
+        let n2 = graph1.addNode(value: "n2")
+        try graph1.addEdge(n0.nodeNumber, n1.nodeNumber, value: "e01")
+        try graph1.addEdge(n1.nodeNumber, n2.nodeNumber, value: "e12")
+        try graph1.addEdge(n2.nodeNumber, n0.nodeNumber, value: "e20")
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(graph1.makeEncodingDelegate())

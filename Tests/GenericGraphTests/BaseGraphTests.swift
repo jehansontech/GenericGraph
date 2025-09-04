@@ -32,10 +32,10 @@ final class BaseGraphTests: XCTestCase {
     
     func test_graphCreation() throws {
         let graph = BaseGraph<String, String>();
-        let node0 = graph.addNode("node0");
-        let node1 = graph.addNode("node1");
-        let edge0 = try graph.addEdge(node0.nodeNumber, node1.nodeNumber, "edge0")
-        let edge1 = try graph.addEdge(node1.nodeNumber, node0.nodeNumber, "edge1")
+        let node0 = graph.addNode(value: "node0");
+        let node1 = graph.addNode(value: "node1");
+        let edge0 = try graph.addEdge(node0.nodeNumber, node1.nodeNumber, value: "edge0")
+        let edge1 = try graph.addEdge(node1.nodeNumber, node0.nodeNumber, value: "edge1")
 
         XCTAssertNotEqual(node0.nodeNumber, node1.nodeNumber)
         XCTAssertEqual(node0.outDegree, 1)
@@ -68,10 +68,10 @@ final class BaseGraphTests: XCTestCase {
 
     func test_nodeDeletion() throws {
         let graph = BaseGraph<String, String>();
-        let node0 = graph.addNode("node0");
-        let node1 = graph.addNode("node1");
-        try graph.addEdge(node0.nodeNumber, node1.nodeNumber, "edge0")
-        try graph.addEdge(node1.nodeNumber, node0.nodeNumber, "edge1")
+        let node0 = graph.addNode(value: "node0");
+        let node1 = graph.addNode(value: "node1");
+        try graph.addEdge(node0.nodeNumber, node1.nodeNumber, value: "edge0")
+        try graph.addEdge(node1.nodeNumber, node0.nodeNumber, value: "edge1")
 
         graph.removeNode(node0.nodeNumber)
 
@@ -82,10 +82,10 @@ final class BaseGraphTests: XCTestCase {
 
     func test_edgeDeletion() throws {
         let graph = BaseGraph<String, String>();
-        let node0 = graph.addNode("node0");
-        let node1 = graph.addNode("node1");
-        let edge0 = try graph.addEdge(node0.nodeNumber, node1.nodeNumber, "edge0")
-        let edge1 = try graph.addEdge(node1.nodeNumber, node0.nodeNumber, "edge1")
+        let node0 = graph.addNode(value: "node0");
+        let node1 = graph.addNode(value: "node1");
+        let edge0 = try graph.addEdge(node0.nodeNumber, node1.nodeNumber, value: "edge0")
+        let edge1 = try graph.addEdge(node1.nodeNumber, node0.nodeNumber, value: "edge1")
 
         graph.removeEdge(edge0.edgeNumber)
 
