@@ -49,6 +49,23 @@ extension Node {
         return inEdges.count + outEdges.count
     }
 
+    /// Includes both out-edge and in-edges.
+    public func edgesToNeighbor(_ nodeNumber: Int) -> [EdgeType] {
+        var edges = [EdgeType]()
+        for outEdge in outEdges {
+            if outEdge.target.nodeNumber == nodeNumber {
+                edges.append(outEdge)
+            }
+        }
+        for inEdge in inEdges {
+            if inEdge.source.nodeNumber == nodeNumber {
+                edges.append(inEdge)
+            }
+        }
+        return edges
+    }
+
+    /// Looks at both out-edge and in-edges.
     public func hasEdge(to nodeNumber: Int) -> Bool {
         for outEdge in outEdges {
             if outEdge.target.nodeNumber == nodeNumber {
