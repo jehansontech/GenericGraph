@@ -225,6 +225,7 @@ extension BoundingBox {
         ]
     }
 
+    /// Radius of a sphere that contains the bbox, i.e., max distance from center to any corner
     public var radius: Float {
         var rx: Float = 0
         let cx = self.center
